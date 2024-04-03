@@ -68,6 +68,6 @@ const password = ref('')
 const remember = ref('')
 const router = useRouter()
 const handleLogIn = () => {
-  router.push({ name: 'Home' })
+  router.push({ name: 'home' })
 }
 </script>
