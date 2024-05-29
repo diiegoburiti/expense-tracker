@@ -84,7 +84,7 @@ const handleLogIn = async () => {
         life: 3000
       })
     }
-    router.push({ name: 'home' })
+    return router.push({ name: 'home' })
   } catch (error) {
     console.error(error)
   }
