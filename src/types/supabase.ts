@@ -9,35 +9,67 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      records: {
+      months: {
         Row: {
-          accountName: string
-          accountType: string
-          created_at: string
-          expenses: Json | null
+          amount: number
           id: number
-          intialAmount: number
-          update_at: string | null
+          monthName: string | null
+          name: string
+          type: string
         }
         Insert: {
-          accountName: string
-          accountType: string
-          created_at?: string
-          expenses?: Json | null
+          amount: number
           id?: number
-          intialAmount: number
-          update_at?: string | null
+          monthName?: string | null
+          name: string
+          type: string
         }
         Update: {
-          accountName?: string
-          accountType?: string
-          created_at?: string
-          expenses?: Json | null
+          amount?: number
           id?: number
-          intialAmount?: number
-          update_at?: string | null
+          monthName?: string | null
+          name?: string
+          type?: string
         }
         Relationships: []
+      }
+      records: {
+        Row: {
+          amount: number
+          category: string
+          description: string | null
+          id: number
+          month: string
+          month_id: number | null
+          'record-type': Database['public']['Enums']['record-type'] | null
+        }
+        Insert: {
+          amount: number
+          category: string
+          description?: string | null
+          id?: number
+          month: string
+          month_id?: number | null
+          'record-type'?: Database['public']['Enums']['record-type'] | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          description?: string | null
+          id?: number
+          month?: string
+          month_id?: number | null
+          'record-type'?: Database['public']['Enums']['record-type'] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'records_month_id_fkey'
+            columns: ['month_id']
+            isOneToOne: false
+            referencedRelation: 'months'
+            referencedColumns: ['id']
+          }
+        ]
       }
     }
     Views: {
@@ -47,7 +79,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      'record-type': 'income' | 'expense'
     }
     CompositeTypes: {
       [_ in never]: never
