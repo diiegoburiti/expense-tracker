@@ -1,35 +1,33 @@
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = {
+  name: string
+  category: string
+  icon: string
+}
 
 export type Database = {
   public: {
     Tables: {
-      months: {
+      accounts: {
         Row: {
           amount: number
           id: number
-          monthName: string | null
+          monthName: string
           name: string
-          type: string
+          type: Json
         }
         Insert: {
           amount: number
           id?: number
-          monthName?: string | null
+          monthName: string
           name: string
-          type: string
+          type: Json
         }
         Update: {
           amount?: number
           id?: number
-          monthName?: string | null
+          monthName?: string
           name?: string
-          type?: string
+          type?: Json
         }
         Relationships: []
       }
@@ -66,7 +64,7 @@ export type Database = {
             foreignKeyName: 'records_month_id_fkey'
             columns: ['month_id']
             isOneToOne: false
-            referencedRelation: 'months'
+            referencedRelation: 'accounts'
             referencedColumns: ['id']
           }
         ]

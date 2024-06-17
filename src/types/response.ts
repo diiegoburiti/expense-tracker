@@ -1,9 +1,15 @@
-export type AccountInfoResponseData = {
+type AccountType = {
+  name: string
+  category: string
+  icon: string
+}
+
+export type AccountResponseData = {
   amount: number
   id: number
-  monthName: string | null
+  monthName: string
   name: string
-  type: string
+  type: AccountType
 }
 
 export type RecordsResponseData = {
