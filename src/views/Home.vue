@@ -33,7 +33,7 @@
                     </div>
                     <div class="flex justify-content-between w-full">
                       <span class="flex-1">{{ item.name }}</span>
-                      <span class="flex-1">{{ item.type }}</span>
+                      <span class="flex-1">{{ item.type.name }}</span>
                       <span>${{ item.amount }}</span>
                     </div>
                   </div>
@@ -119,32 +119,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref } from 'vue'
 import { supabase } from '@/supababse'
 import { useToast } from 'primevue/usetoast'
-
-type ExpensesDataTypes = {
-  amount: number
-  id: number
-  monthName: string | null
-  name: string
-  type: string
-}
+import type { AccountResponseData } from '@/types/response'
 
 const visible = ref(false)
 const amount = ref(0)
 const accountName = ref('')
 const accountType = ref()
 const accountMonth = ref()
-const expensesData = ref<Array<ExpensesDataTypes>>()
+const expensesData = ref<Array<AccountResponseData>>()
 const loadingData = ref(true)
 
 const toast = useToast()
 
 const optionsForAccountType = [
-  { name: 'General', type: 'general', icon: 'pi pi-wallet' },
-  { name: 'Credit Card', type: 'credit-card', icon: 'pi pi-credit-card' },
-  { name: 'Insvestiment', type: 'investiment', icon: 'pi pi-angle-double-up' }
+  { name: 'General', category: 'general', icon: 'pi pi-wallet' },
+  { name: 'Credit Card', category: 'credit-card', icon: 'pi pi-credit-card' },
+  { name: 'Investment', category: 'investment', icon: 'pi pi-angle-double-up' }
 ]
 
 const optionsForAccountMonth = [
@@ -162,20 +155,25 @@ const optionsForAccountMonth = [
   { name: 'December' }
 ]
 
-watchEffect(() => {
-  console.log(accountMonth.value)
-})
-
 const registerAccount = async () => {
   try {
-    const { status } = await supabase.from('months').insert([
+    const { status, error } = await supabase.from('accounts').insert([
       {
         monthName: accountMonth.value.name,
         amount: amount.value,
         name: accountName.value,
-        type: accountType.value.type
+        type: accountType.value
       }
     ])
+
+    if (error) {
+      toast.add({
+        severity: 'error',
+        summary: error.message,
+        detail: error.details,
+        life: 3000
+      })
+    }
 
     if (status === 201) {
       visible.value = false
@@ -185,16 +183,16 @@ const registerAccount = async () => {
         detail: 'Account registered with success!!',
         life: 3000
       })
-      return await fetchRegisters()
+      return await fetchAccounts()
     }
   } catch (error: any) {
     console.log(error.message)
   }
 }
 
-const fetchRegisters = async () => {
+const fetchAccounts = async () => {
   try {
-    const { data, error } = await supabase.from('months').select('*')
+    const { data, error } = await supabase.from('accounts').select('*')
 
     if (data) {
       expensesData.value = data
@@ -203,8 +201,8 @@ const fetchRegisters = async () => {
     if (error) {
       return toast.add({
         severity: 'error',
-        summary: 'Ops!',
-        detail: error.message,
+        summary: error.message,
+        detail: error.details,
         life: 3000
       })
     }
@@ -217,7 +215,7 @@ const fetchRegisters = async () => {
 
 onMounted(async () => {
   loadingData.value = true
-  await fetchRegisters()
+  await fetchAccounts()
 })
 </script>
 

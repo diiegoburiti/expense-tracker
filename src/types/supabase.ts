@@ -35,27 +35,27 @@ export type Database = {
         Row: {
           amount: number
           category: string
-          description: string | null
+          date: string
+          description: string
           id: number
-          month: string
           month_id: number | null
           'record-type': Database['public']['Enums']['record-type'] | null
         }
         Insert: {
           amount: number
           category: string
-          description?: string | null
+          date: string
+          description: string
           id?: number
-          month: string
           month_id?: number | null
           'record-type'?: Database['public']['Enums']['record-type'] | null
         }
         Update: {
           amount?: number
           category?: string
-          description?: string | null
+          date: string
+          description: string
           id?: number
-          month?: string
           month_id?: number | null
           'record-type'?: Database['public']['Enums']['record-type'] | null
         }
