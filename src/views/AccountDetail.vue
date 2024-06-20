@@ -38,23 +38,29 @@
                 >Account Name</span
               >
               <br />
-              <span class="text-base">{{ accountInfo?.name }}</span>
-              <Skeleton v-if="isLoading" height="1.8rem" width="8rem" />
+              <span v-if="!isLoading" class="text-base">{{
+                accountInfo?.name
+              }}</span>
+              <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
               <div class="mt-2">
                 <span class="text-xs font-medium text-color-secondary">
                   Account Type
                 </span>
                 <br />
-                <span class="text-base"> {{ accountInfo?.type?.name }} </span>
-                <Skeleton v-if="isLoading" height="1.8rem" width="8rem" />
+                <span v-if="!isLoading" class="text-base">
+                  {{ accountInfo?.type?.name }}
+                </span>
+                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
               </div>
               <div class="mt-2">
                 <span class="text-xs font-medium text-color-secondary">
                   Account Month
                 </span>
                 <br />
-                <span class="text-base"> {{ accountInfo?.monthName }} </span>
-                <Skeleton v-if="isLoading" height="1.8rem" width="8rem" />
+                <span v-if="!isLoading" class="text-base">
+                  {{ accountInfo?.monthName }}
+                </span>
+                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
               </div>
             </div>
           </div>
@@ -95,35 +101,36 @@
       <div>
         <h6 class="text-color text-2xl m-0">Transactions</h6>
         <br />
-        <div v-bind:key="item.id" v-for="item in recordsData">
-          <Card
-            class="mb-3"
-            :style="
-              item['record-type'] === 'income'
-                ? 'border-right: 10px solid var(--green-500)'
-                : 'border-right: 10px solid var(--red-500)'
-            "
-            :pt="{ body: { class: 'p-2' } }"
-          >
-            <template #content>
-              <div class="flex align-items-center">
-                <p class="m-0 text-color flex-1 capitalize">
-                  {{ item.description }}
-                </p>
-                <p class="m-0 text-color flex-1">
-                  {{ item.amount }}
-                </p>
-                <p class="m-0 text-color capitalize">
-                  {{ formatDate(item.date) }}
-                </p>
-                <div class="ml-4 flex gap-2">
-                  <Button
-                    text
-                    raised
-                    rounded
-                    aria-label="Cancel"
-                    icon="pi pi-pencil"
-                    severity="info"
+        <div v-if="!isLoading">
+          <div v-bind:key="item.id" v-for="item in recordsData">
+            <Card
+              class="mb-3"
+              :style="
+                item['record-type'] === 'income'
+                  ? 'border-right: 10px solid var(--green-500)'
+                  : 'border-right: 10px solid var(--red-500)'
+              "
+              :pt="{ body: { class: 'p-2' } }"
+            >
+              <template #content>
+                <div class="flex align-items-center">
+                  <p class="m-0 text-color flex-1 capitalize">
+                    {{ item.description }}
+                  </p>
+                  <p class="m-0 text-color flex-1">
+                    {{ item.amount }}
+                  </p>
+                  <p class="m-0 text-color capitalize">
+                    {{ formatDate(item.date) }}
+                  </p>
+                  <div class="ml-4 flex gap-2">
+                    <Button
+                      text
+                      raised
+                      rounded
+                      aria-label="Cancel"
+                      icon="pi pi-pencil"
+                      severity="info"
                   />
                   <Button
                     icon="pi pi-trash"
@@ -137,6 +144,13 @@
               </div>
             </template>
           </Card>
+          </div>
+        </div>
+
+        <div v-else class="flex flex-column gap-3">
+          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
+          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
+          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
         </div>
       </div>
     </div>
