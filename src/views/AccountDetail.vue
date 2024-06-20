@@ -246,7 +246,7 @@
             class="flex-auto"
             autocomplete="off"
             placeholder="Type the account name"
-            v-bind:model-value="accountInfo.name"
+            v-model="accountName"
           />
           <label for="account-month" class="text-sm">Account month</label>
 
@@ -442,12 +442,16 @@ const deleteAccount = async () => {
 
 const handleEditAccount = async () => {
   try {
-    const { status, error } = await supabase.from('accounts').update({
-      monthName: accountMonth.value.name,
-      amount: accountAmount.value,
-      type: accountType.value,
-      name: accountName.value
-    })
+    const { status, error } = await supabase
+      .from('accounts')
+      .update({
+        monthName: accountMonth.value.name,
+        amount: accountAmount.value,
+        type: accountType.value,
+        name: accountName.value
+      })
+      .eq('id', monthId)
+      .select()
 
     if (status === 204) {
       toast.add({
