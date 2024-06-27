@@ -591,7 +591,13 @@ const handleEditRecord = async () => {
       .select()
 
     if (status === 200) {
-      await fetchInitialData()
+      toast.add({
+        severity: 'success',
+        summary: 'Record Edited!!',
+        detail: 'The record was edited with success!!',
+        life: 3000
+      })
+      await fetchRecords()
     }
   } catch (error) {
     console.error(error)
