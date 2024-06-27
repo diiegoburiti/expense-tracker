@@ -2,7 +2,7 @@
   <Toast />
   <section class="surface-ground h-screen">
     <div class="pt-5 mx-5">
-      <Card class="">
+      <Card>
         <template #content>
           <div>
             <div class="flex justify-content-between">
@@ -546,13 +546,14 @@ const handleEditAccount = async () => {
       .eq('id', monthId)
       .select()
 
-    if (status === 204) {
+    if (status === 200) {
       toast.add({
         severity: 'success',
         summary: 'Account Edited!!',
         detail: 'The account was edited with success!!',
         life: 3000
       })
+      await fetchAccountInfo()
     }
 
     if (error) {
@@ -606,32 +607,10 @@ const handleEditRecord = async () => {
 
 const handleDeleteRecord = () => {}
 
-const fetchInitialData = async () => {
+const fetchRecords = async () => {
   isLoading.value = true
+
   try {
-    const { data: accountDataResponse, error: accountError } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('id', monthId)
-
-    if (accountError) {
-      return toast.add({
-        severity: 'error',
-        summary: accountError.message,
-        life: 3000
-      })
-    }
-
-    if (accountDataResponse && accountDataResponse.length > 0) {
-      const { monthName, name, amount, type } = accountDataResponse[0]
-
-      accountInfo.value = accountDataResponse[0]
-      accountMonth.value.name = monthName
-      accountName.value = name
-      accountAmount.value = amount
-      accountType.value = type
-    }
-
     const { data: recordsDataResponse, error: recordsError } = await supabase
       .from('records')
       .select('*')
@@ -644,7 +623,6 @@ const fetchInitialData = async () => {
         life: 3000
       })
     }
-
     recordsData.value = recordsDataResponse
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -653,7 +631,42 @@ const fetchInitialData = async () => {
   }
 }
 
+const fetchAccountInfo = async () => {
+  isLoading.value = true
+
+  try {
+    const { data: accountDataResponse, error: accountError } = await supabase
+      .from('accounts')
+      .select('*')
+      .eq('id', monthId)
+
+    if (accountDataResponse && accountDataResponse.length > 0) {
+      const { monthName, name, amount, type } = accountDataResponse[0]
+
+      accountInfo.value = accountDataResponse[0]
+      accountMonth.value.name = monthName
+      accountName.value = name
+      accountAmount.value = amount
+      accountType.value = type
+    }
+
+    if (accountError) {
+      return toast.add({
+        severity: 'error',
+        summary: accountError.message,
+        life: 3000
+      })
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 onMounted(async () => {
-  await fetchInitialData()
+  //await fetchInitialData()
+  await fetchAccountInfo()
+  await fetchRecords()
 })
 </script>
