@@ -15,7 +15,7 @@ export type AccountResponseData = {
 export type RecordsResponseData = {
   amount: number
   category: string
-  description: string | null
+  description: string
   id: number
   date: string
   month_id: number | null
