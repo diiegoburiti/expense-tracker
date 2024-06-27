@@ -49,6 +49,7 @@
         label="Log In"
         @click="handleLogIn"
         :disabled="disableButton"
+        :loading="isLoading"
       ></Button>
     </div>
   </section>
@@ -63,6 +64,7 @@ import { useToast } from 'primevue/usetoast'
 const email = ref('')
 const password = ref('')
 const remember = ref('')
+const isLoading = ref(false)
 const router = useRouter()
 
 const toast = useToast()
@@ -70,6 +72,7 @@ const toast = useToast()
 const disableButton = computed(() => !email.value || !password.value)
 
 const handleLogIn = async () => {
+  isLoading.value = true
   try {
     const { error } = await supabase.auth.signInWithPassword({
       email: email.value,
@@ -87,6 +90,8 @@ const handleLogIn = async () => {
     return router.push({ name: 'home' })
   } catch (error) {
     console.error(error)
+  } finally {
+    isLoading.value = false
   }
 }
 </script>
