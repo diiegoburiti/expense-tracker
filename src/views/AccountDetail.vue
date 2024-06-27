@@ -131,19 +131,21 @@
                       aria-label="Cancel"
                       icon="pi pi-pencil"
                       severity="info"
-                  />
-                  <Button
-                    icon="pi pi-trash"
-                    severity="danger"
-                    rounded
-                    raised
-                    outlined
-                    aria-label="Cancel"
-                  />
+                      @click="editRecord(item)"
+                    />
+                    <Button
+                      icon="pi pi-trash"
+                      severity="danger"
+                      rounded
+                      raised
+                      outlined
+                      aria-label="Cancel"
+                      @click="handleDeleteRecord"
+                    />
+                  </div>
                 </div>
-              </div>
-            </template>
-          </Card>
+              </template>
+            </Card>
           </div>
         </div>
 
@@ -211,11 +213,12 @@
               <label for="record-data" class="text-sm">Date</label>
               <Calendar
                 id="record-data"
-                v-model="expenseDate"
                 showIcon
                 iconDisplay="input"
                 class="w-full"
                 placeholder="Select a date"
+                dateFormat="dd/mm/yy"
+                v-model="expenseDate"
               />
             </div>
           </div>
@@ -308,7 +311,61 @@
         </div>
 
         <div class="flex mt-5">
-          <Button label="Save" class="w-full" type="submit"></Button>
+          <Button
+            label="Save"
+            class="w-full"
+            type="submit"
+            @click="modalEditAccount = false"
+          />
+        </div>
+      </form>
+    </Dialog>
+    <Dialog
+      header="Edit Record"
+      class="w-25rem"
+      modal
+      v-model:visible="editingRecord"
+      :draggable="false"
+    >
+      <form @submit.prevent="handleEditRecord">
+        <div class="flex flex-column gap-2 gap-2 mb-3">
+          <label for="record-name" class="text-sm">Record name</label>
+          <InputText
+            id="record-name"
+            class="flex-auto"
+            autocomplete="off"
+            placeholder="Type the account name"
+            v-model="recordToBeEdited.description"
+            required
+          />
+
+          <label for="record-value" class="text-sm">Record value</label>
+          <InputNumber
+            id="record-value"
+            inputId="locale-user"
+            v-model="recordToBeEdited.amount"
+            required
+          />
+
+          <label for="record-data" class="text-sm">Date</label>
+          <Calendar
+            id="record-data"
+            showIcon
+            iconDisplay="input"
+            class="w-full"
+            placeholder="Select a date"
+            dateFormat="dd/mm/yy"
+            v-model="newRecordDate"
+          />
+        </div>
+
+        <div class="flex mt-5">
+          <Button
+            label="Save"
+            class="w-full"
+            type="submit"
+            @click="editingRecord = false"
+          />
         </div>
       </form>
     </Dialog>
@@ -316,7 +373,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { supabase } from '@/supababse'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
@@ -373,6 +430,10 @@ const recordsData = ref<RecordsResponseData[]>()
 const accountInfo = ref<AccountResponseData>({} as AccountResponseData)
 const isLoading = ref(false)
 
+const editingRecord = ref(false)
+const recordToBeEdited = ref<RecordsResponseData>({} as RecordsResponseData)
+const newRecordDate = ref()
+
 const accountName = ref()
 const accountAmount = ref()
 const accountMonth = ref({ name: '' })
@@ -384,18 +445,38 @@ const accountType = ref({
 
 const monthId = Number(route.params.id)
 
-watchEffect(() => {
-  console.log(route.params.id)
-})
-
 const handleGoBack = () => {
   router.push({ name: 'home' })
 }
 
 const formatDate = (date: string) => {
+  if (!date) return ''
   const [year, month, day] = date.substring(0, 10).split('-')
   return `${day}/${month}/${year}`
 }
+
+const expense = computed(() => {
+  return (
+    recordsData.value?.reduce(
+      (acc, currentValue) => acc + currentValue.amount,
+      0
+    ) || 0
+  )
+})
+
+const balance = computed(() => {
+  const accountAmount = accountInfo.value.amount || 0
+  if (accountAmount > expense?.value) {
+    return {
+      balanceValue: accountAmount - expense?.value,
+      isBalanceStatusPositive: true
+    }
+  }
+  return {
+    balanceValue: accountAmount,
+    isBalanceStatusPositive: false
+  }
+})
 
 const addRecord = async () => {
   try {
@@ -409,8 +490,6 @@ const addRecord = async () => {
         'record-type': 'expense'
       }
     ])
-
-    console.log({ error })
 
     if (error) {
       return toast.add({
@@ -490,30 +569,38 @@ const handleEditAccount = async () => {
   }
 }
 
-const expense = computed(() => {
-  return (
-    recordsData.value?.reduce(
-      (acc, currentValue) => acc + currentValue.amount,
-      0
-    ) || 0
-  )
-})
+const editRecord = (item: RecordsResponseData) => {
+  recordToBeEdited.value = item
+  newRecordDate.value = formatDate(item.date)
+  editingRecord.value = true
+}
 
-const balance = computed(() => {
-  const accountAmount = accountInfo.value.amount || 0
-  if (accountAmount > expense?.value) {
-    return {
-      balanceValue: accountAmount - expense?.value,
-      isBalanceStatusPositive: true
+const handleEditRecord = async () => {
+  const { id, description, amount, category } = recordToBeEdited.value
+  try {
+    const { status } = await supabase
+      .from('records')
+      .update({
+        date: newRecordDate.value,
+        id: id,
+        description,
+        amount,
+        category
+      })
+      .eq('id', recordToBeEdited.value!.id)
+      .select()
+
+    if (status === 200) {
+      await fetchInitialData()
     }
+  } catch (error) {
+    console.error(error)
   }
-  return {
-    balanceValue: accountAmount,
-    isBalanceStatusPositive: false
-  }
-})
+}
 
-onMounted(async () => {
+const handleDeleteRecord = () => {}
+
+const fetchInitialData = async () => {
   isLoading.value = true
   try {
     const { data: accountDataResponse, error: accountError } = await supabase
@@ -558,5 +645,9 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+onMounted(async () => {
+  await fetchInitialData()
 })
 </script>
