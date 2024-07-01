@@ -485,15 +485,11 @@ const expense = computed(() => {
 
 const balance = computed(() => {
   const accountAmount = accountInfo.value.amount || 0
-  if (accountAmount > expense?.value) {
-    return {
-      balanceValue: accountAmount - expense?.value,
-      isBalanceStatusPositive: true
-    }
-  }
+  const balanceValue = accountAmount - expense.value
+
   return {
-    balanceValue: accountAmount,
-    isBalanceStatusPositive: false
+    balanceValue: balanceValue,
+    isBalanceStatusPositive: balanceValue >= 0
   }
 })
 
@@ -521,12 +517,13 @@ const addRecord = async () => {
 
     isModalVisible.value = false
 
-    return toast.add({
+    toast.add({
       severity: 'success',
       summary: 'Yeah!',
       detail: 'Record added with success',
       life: 3000
     })
+    return await fetchRecords()
   } catch (error) {
     console.error(error)
   } finally {
@@ -652,8 +649,6 @@ const handleEditRecord = async () => {
   }
 }
 
-const handleDeleteRecord = () => {}
-
 const fetchRecords = async () => {
   isLoading.value = true
 
@@ -712,7 +707,6 @@ const fetchAccountInfo = async () => {
 }
 
 onMounted(async () => {
-  //await fetchInitialData()
   await fetchAccountInfo()
   await fetchRecords()
 })
