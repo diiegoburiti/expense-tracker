@@ -140,7 +140,7 @@
                       raised
                       outlined
                       aria-label="Cancel"
-                      @click="handleDeleteRecord"
+                      @click="deleteRecord(item)"
                     />
                   </div>
                 </div>
@@ -369,6 +369,23 @@
         </div>
       </form>
     </Dialog>
+    <Dialog
+      header="Delete Record"
+      class="w-25rem"
+      modal
+      v-model:visible="showDeleteRecord"
+      :draggable="false"
+    >
+      <span>Are you sure you want to delete this record?</span>
+      <div class="mt-4 flex gap-4">
+        <Button
+          label="Cancel"
+          severity="info"
+          @click="showDeleteRecord = false"
+        />
+        <Button label="Delete" severity="danger" @click="handleDeleteRecord" />
+      </div>
+    </Dialog>
   </section>
 </template>
 
@@ -423,6 +440,7 @@ const category = ref()
 const isModalVisible = ref(false)
 const modalConfirmation = ref(false)
 const modalEditAccount = ref(false)
+const showDeleteRecord = ref(false)
 const expenseName = ref()
 const expenseValue = ref()
 const expenseDate = ref()
@@ -432,6 +450,7 @@ const isLoading = ref(false)
 
 const editingRecord = ref(false)
 const recordToBeEdited = ref<RecordsResponseData>({} as RecordsResponseData)
+const recordToBeDeleted = ref<RecordsResponseData>({} as RecordsResponseData)
 const newRecordDate = ref()
 
 const accountName = ref()
@@ -528,8 +547,36 @@ const deleteAccount = async () => {
       detail: 'The account was deleted!!',
       life: 3000
     })
-    modalConfirmation.value = false
-    router.push({ name: 'home' })
+    showDeleteRecord.value = false
+    handleGoBack()
+  }
+}
+
+const deleteRecord = (item: RecordsResponseData) => {
+  recordToBeDeleted.value = item
+  showDeleteRecord.value = true
+}
+
+const handleDeleteRecord = async () => {
+  const recordId = recordToBeDeleted.value.id
+
+  try {
+    const { status } = await supabase
+      .from('records')
+      .delete()
+      .eq('id', recordId)
+
+    if (status === 204) {
+      toast.add({
+        severity: 'success',
+        summary: 'Account Deleted!!',
+        detail: 'The account was deleted!!',
+        life: 3000
+      })
+      showDeleteRecord.value = false
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error)
   }
 }
 
