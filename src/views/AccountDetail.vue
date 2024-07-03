@@ -305,7 +305,7 @@
           <InputNumber
             id="starting-amount"
             inputId="locale-user"
-            v-model="accountInfo.amount"
+            v-model="accountAmount"
             required
           />
         </div>
