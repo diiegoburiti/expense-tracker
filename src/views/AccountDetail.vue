@@ -69,23 +69,25 @@
 
       <div class="flex gap-4 my-4">
         <Card>
-          <template #title>Budget</template>
+          <template #title><span class="text-lg">Budget</span></template>
           <template #content>
-            <p class="m-0 text-color-secondary">{{ accountInfo?.amount }}</p>
+            <p class="m-0 text-color-secondary text-xl font-bold">
+              {{ accountInfo?.amount }}
+            </p>
           </template>
         </Card>
         <Card>
-          <template #title>Expense</template>
+          <template #title><span class="text-lg">Expense</span></template>
           <template #content>
-            <p class="m-0 text-red-500">{{ expense }}</p>
+            <p class="m-0 text-red-500 text-xl font-bold">{{ expense }}</p>
           </template>
         </Card>
 
         <Card>
-          <template #title>Balance</template>
+          <template #title><span class="text-lg">Balance</span></template>
           <template #content>
             <p
-              class="m-0"
+              class="m-0 text-xl font-bold"
               :class="
                 balance.isBalanceStatusPositive
                   ? 'text-green-500'
