@@ -149,6 +149,9 @@
               </template>
             </Card>
           </div>
+          <div v-if="!recordsData?.length">
+            Ops! There are not transitions yet :/
+          </div>
         </div>
 
         <div v-else class="flex flex-column gap-3">
@@ -187,12 +190,13 @@
             </div>
 
             <div>
-              <label for="amount" class="text-sm">Amount</label>
+              <label for="locale-us" class="text-sm">Amount</label>
               <InputNumber
-                placeholder="0"
-                id="amount"
-                inputId="locale-user"
                 v-model="expenseValue"
+                inputId="locale-us"
+                locale="en-US"
+                :minFractionDigits="1"
+                placeholder="Amount value"
               />
             </div>
           </div>
@@ -201,20 +205,20 @@
             <div class="col">
               <label for="record-type" class="text-sm mb-2">Expense type</label>
               <Dropdown
-                id="record-type"
+                filter
+                class="w-full"
+                inputId="record-type"
                 v-model="category"
                 :options="categories"
-                filter
                 optionLabel="name"
                 placeholder="Select a category"
-                class="w-full"
               />
             </div>
 
             <div class="flex-1">
               <label for="record-data" class="text-sm">Date</label>
               <Calendar
-                id="record-data"
+                inputId="record-data"
                 showIcon
                 iconDisplay="input"
                 class="w-full"
@@ -343,10 +347,11 @@
 
           <label for="record-value" class="text-sm">Record value</label>
           <InputNumber
-            id="record-value"
-            inputId="locale-user"
-            v-model="recordToBeEdited.amount"
+            inputId="record-value"
+            locale="en-US"
+            :minFractionDigits="1"
             required
+            v-model="recordToBeEdited.amount"
           />
 
           <label for="record-data" class="text-sm">Date</label>
@@ -406,6 +411,10 @@ const categories = [
   { name: 'Life & Entertainment' },
   { name: 'Communication & PC' },
   { name: 'Financial Expenses' },
+  { name: 'Health' },
+  { name: 'Sports' },
+  { name: 'Fitness' },
+  { name: 'Wellness' },
   { name: 'Income' },
   { name: 'Others' }
 ]
@@ -568,10 +577,11 @@ const handleDeleteRecord = async () => {
     if (status === 204) {
       toast.add({
         severity: 'success',
-        summary: 'Account Deleted!!',
-        detail: 'The account was deleted!!',
+        summary: 'Record Deleted!!',
+        detail: 'The record was deleted!!',
         life: 3000
       })
+      await fetchRecords()
       showDeleteRecord.value = false
     }
   } catch (error) {
