@@ -71,22 +71,26 @@
         <Card>
           <template #title><span class="text-lg">Budget</span></template>
           <template #content>
-            <p class="m-0 text-color-secondary text-xl font-bold">
+            <span class="m-0 text-color-secondary text-xl font-bold">
+              <span class="font-normal">$</span>
               {{ accountInfo?.amount }}
-            </p>
+            </span>
           </template>
         </Card>
         <Card>
           <template #title><span class="text-lg">Expense</span></template>
           <template #content>
-            <p class="m-0 text-red-500 text-xl font-bold">{{ expense }}</p>
+            <span class="m-0 text-red-500 text-xl font-bold">
+              <span class="font-normal">$</span>
+              {{ expense - income }}
+            </span>
           </template>
         </Card>
 
         <Card>
           <template #title><span class="text-lg">Balance</span></template>
           <template #content>
-            <p
+            <span
               class="m-0 text-xl font-bold"
               :class="
                 balance.isBalanceStatusPositive
@@ -94,8 +98,9 @@
                   : 'text-red-500'
               "
             >
+              <span class="font-normal">$</span>
               {{ balance.balanceValue }}
-            </p>
+            </span>
           </template>
         </Card>
       </div>
@@ -108,7 +113,7 @@
             <Card
               class="mb-3"
               :style="
-                item['record-type'] === 'income'
+                item['record-type'] === RecordType.INCOME
                   ? 'border-right: 10px solid var(--green-500)'
                   : 'border-right: 10px solid var(--red-500)'
               "
@@ -177,6 +182,28 @@
     >
       <form @submit.prevent="addRecord">
         <div class="flex flex-column gap-2 gap-2 mb-3">
+          <div class="flex align-items-center gap-3">
+            <div>
+              <RadioButton
+                v-model="recordType"
+                inputId="isExpense"
+                name="expense"
+                value="Expense"
+              />
+              <label for="isExpense" class="ml-2">Expense</label>
+            </div>
+
+            <div>
+              <RadioButton
+                v-model="recordType"
+                inputId="isIncome"
+                name="income"
+                value="Income"
+              />
+              <label for="isIncome" class="ml-2">Income</label>
+            </div>
+          </div>
+          <Divider />
           <div class="flex gap-2">
             <div>
               <label for="record-name" class="text-sm">Record name</label>
@@ -229,7 +256,6 @@
             </div>
           </div>
         </div>
-
         <div class="flex justify-content-center mt-5">
           <Button label="Add Record" class="w-6" type="submit" />
         </div>
@@ -397,11 +423,18 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watchEffect } from 'vue'
 import { supabase } from '@/supababse'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
 import type { AccountResponseData, RecordsResponseData } from '@/types/response'
+import RadioButton from 'primevue/radiobutton'
+import Divider from 'primevue/divider'
+
+enum RecordType {
+  INCOME = 'Income',
+  EXPENSE = 'Expense'
+}
 
 const categories = [
   { name: 'Food' },
@@ -416,7 +449,8 @@ const categories = [
   { name: 'Fitness' },
   { name: 'Wellness' },
   { name: 'Income' },
-  { name: 'Others' }
+  { name: 'Others' },
+  { name: 'Refund' }
 ]
 
 const optionsForAccountType = [
@@ -458,12 +492,10 @@ const expenseDate = ref()
 const recordsData = ref<RecordsResponseData[]>()
 const accountInfo = ref<AccountResponseData>({} as AccountResponseData)
 const isLoading = ref(false)
-
 const editingRecord = ref(false)
 const recordToBeEdited = ref<RecordsResponseData>({} as RecordsResponseData)
 const recordToBeDeleted = ref<RecordsResponseData>({} as RecordsResponseData)
 const newRecordDate = ref()
-
 const accountName = ref()
 const accountAmount = ref()
 const accountMonth = ref({ name: '' })
@@ -472,7 +504,7 @@ const accountType = ref({
   category: '',
   icon: ''
 })
-
+const recordType = ref('Expense')
 const monthId = Number(route.params.id)
 
 const handleGoBack = () => {
@@ -486,17 +518,37 @@ const formatDate = (date: string) => {
 }
 
 const expense = computed(() => {
-  return (
-    recordsData.value?.reduce(
-      (acc, currentValue) => acc + currentValue.amount,
-      0
-    ) || 0
+  const expenseRecords =
+    recordsData.value?.filter(
+      (record) => record['record-type'] === RecordType.EXPENSE
+    ) || []
+
+  const totalAmount = expenseRecords.reduce(
+    (acc, currentValue) => acc + currentValue.amount,
+    0
   )
+
+  return totalAmount.toFixed()
+})
+
+const income = computed(() => {
+  const incomeRecords =
+    recordsData.value?.filter(
+      (record) => record['record-type'] === RecordType.INCOME
+    ) || []
+
+  const totalIncome = incomeRecords.reduce(
+    (acc, currentValue) => acc + currentValue.amount,
+    0
+  )
+
+  return totalIncome.toFixed()
 })
 
 const balance = computed(() => {
   const accountAmount = accountInfo.value.amount || 0
-  const balanceValue = accountAmount - expense.value
+  const balanceValue =
+    accountAmount + Number(income.value) - Number(expense.value)
 
   return {
     balanceValue: balanceValue,
@@ -513,7 +565,7 @@ const addRecord = async () => {
         description: expenseName.value,
         category: category.value.name,
         date: expenseDate.value,
-        'record-type': 'expense'
+        'record-type': recordType.value as RecordType
       }
     ])
 
@@ -717,6 +769,10 @@ const fetchAccountInfo = async () => {
     isLoading.value = false
   }
 }
+
+watchEffect(() => {
+  console.log({ income })
+})
 
 onMounted(async () => {
   await fetchAccountInfo()
