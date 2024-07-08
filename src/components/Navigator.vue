@@ -32,16 +32,12 @@ const navigationItems = ref([
     route: '/'
   },
   {
-    label: 'Login',
-    route: '/login'
-  },
-  {
-    label: 'Sign Up',
-    route: 'sign-up'
-  },
-  {
     label: 'About Us',
     route: 'about-us'
+  },
+  {
+    label: 'Login',
+    route: '/login'
   }
 ])
 </script>
