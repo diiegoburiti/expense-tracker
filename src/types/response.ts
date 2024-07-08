@@ -19,5 +19,5 @@ export type RecordsResponseData = {
   id: number
   date: string
   month_id: number | null
-  'record-type': 'income' | 'expense' | null
+  'record-type': 'Income' | 'Expense' | null
 }

@@ -77,7 +77,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      'record-type': 'income' | 'expense'
+      'record-type': 'Income' | 'Expense'
     }
     CompositeTypes: {
       [_ in never]: never
