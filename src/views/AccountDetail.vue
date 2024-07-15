@@ -721,6 +721,7 @@ const fetchRecords = async () => {
       .from('records')
       .select('*')
       .eq('month_id', monthId)
+      .order('date', { ascending: false })
 
     if (recordsError) {
       return toast.add({
