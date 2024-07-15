@@ -6,52 +6,53 @@
     }"
   >
     <Toast />
-    <div class="border-1 surface-border surface-card border-round p-6">
-      <div class="flex align-items-center flex-column gap-3 mb-3">
-        <div class="w-full mb-2">
-          <span class="text-900 text-xl font-bold mb-2 block">Log in</span>
-          <span class="text-800">Please enter your e-mail and password</span>
+    <form @submit.prevent="handleLogIn">
+      <div class="border-1 surface-border surface-card border-round p-6">
+        <div class="flex align-items-center flex-column gap-3 mb-3">
+          <div class="w-full mb-2">
+            <span class="text-900 text-xl font-bold mb-2 block">Log in</span>
+            <span class="text-800">Please enter your e-mail and password</span>
+          </div>
+          <IconField iconPosition="left" class="w-full">
+            <InputIcon class="pi pi-envelope"> </InputIcon>
+            <InputText class="w-full" v-model="email" placeholder="E-mail" />
+          </IconField>
+          <IconField iconPosition="left" class="w-full">
+            <InputIcon class="pi pi-lock"> </InputIcon>
+            <InputText
+              class="w-full"
+              v-model="password"
+              placeholder="Password"
+              type="password"
+            />
+          </IconField>
         </div>
-        <IconField iconPosition="left" class="w-full">
-          <InputIcon class="pi pi-envelope"> </InputIcon>
-          <InputText class="w-full" v-model="email" placeholder="E-mail" />
-        </IconField>
-        <IconField iconPosition="left" class="w-full">
-          <InputIcon class="pi pi-lock"> </InputIcon>
-          <InputText
-            class="w-full"
-            v-model="password"
-            placeholder="Password"
-            type="password"
-          />
-        </IconField>
-      </div>
 
-      <div class="flex align-items-center justify-content-between mb-3">
-        <div class="flex align-items-center">
-          <Checkbox
-            v-model="remember"
-            inputId="remember-me"
-            name="remember"
-            value="remember"
-            binary
-          />
-          <label for="remember-me" class="ml-2 text-color text-sm"
-            >Remember Me</label
-          >
+        <div class="flex align-items-center justify-content-between mb-3">
+          <div class="flex align-items-center">
+            <Checkbox
+              v-model="remember"
+              inputId="remember-me"
+              name="remember"
+              value="remember"
+              binary
+            />
+            <label for="remember-me" class="ml-2 text-color text-sm"
+              >Remember Me</label
+            >
+          </div>
+          <Button link label="Reset Password" class="font-color text-sm p-0" />
         </div>
-        <Button link label="Reset Password" class="font-color text-sm p-0" />
-      </div>
 
-      <Button
-        class="w-full"
-        type="button"
-        label="Log In"
-        @click="handleLogIn"
-        :disabled="disableButton"
-        :loading="isLoading"
-      ></Button>
-    </div>
+        <Button
+          class="w-full"
+          type="submit"
+          label="Log In"
+          :disabled="disableButton"
+          :loading="isLoading"
+        ></Button>
+      </div>
+    </form>
   </section>
 </template>
 
