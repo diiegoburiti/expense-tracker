@@ -532,7 +532,7 @@ const expense = computed(() => {
     0
   )
 
-  return totalAmount.toFixed()
+  return Number(totalAmount.toFixed())
 })
 
 const income = computed(() => {
@@ -546,13 +546,12 @@ const income = computed(() => {
     0
   )
 
-  return totalIncome.toFixed()
+  return Number(totalIncome.toFixed())
 })
 
 const balance = computed(() => {
   const accountAmount = accountInfo.value.amount || 0
-  const balanceValue =
-    accountAmount + Number(income.value) - Number(expense.value)
+  const balanceValue = accountAmount + income.value - expense.value
 
   return {
     balanceValue: balanceValue,
