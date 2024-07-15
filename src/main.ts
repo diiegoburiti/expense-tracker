@@ -15,6 +15,9 @@ import ToastService from 'primevue/toastservice'
 import Card from 'primevue/card'
 import Skeleton from 'primevue/skeleton'
 import Calendar from 'primevue/calendar'
+import RadioButton from 'primevue/radiobutton'
+import Divider from 'primevue/divider'
+import Chip from 'primevue/chip'
 
 import App from './App.vue'
 import router from './router'
@@ -43,5 +46,8 @@ app.component('Checkbox', Checkbox)
 app.component('Card', Card)
 app.component('Skeleton', Skeleton)
 app.component('Calendar', Calendar)
+app.component('RadioButton', RadioButton)
+app.component('Divider', Divider)
+app.component('Chip', Chip)
 
 app.mount('#app')

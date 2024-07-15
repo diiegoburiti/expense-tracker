@@ -121,34 +121,40 @@
             >
               <template #content>
                 <div class="flex align-items-center">
-                  <p class="m-0 text-color flex-1 capitalize">
-                    {{ item.description }}
-                  </p>
+                  <div class="flex align-items-center gap-2 flex-1">
+                    <p class="m-0 text-color capitalize">
+                      {{ item.description }}
+                    </p>
+                    <Chip :label="item.category" class="text-xs" />
+                  </div>
+
                   <p class="m-0 text-color flex-1">
                     {{ item.amount }}
                   </p>
-                  <p class="m-0 text-color capitalize">
-                    {{ formatDate(item.date) }}
-                  </p>
-                  <div class="ml-4 flex gap-2">
-                    <Button
-                      text
-                      raised
-                      rounded
-                      aria-label="Cancel"
-                      icon="pi pi-pencil"
-                      severity="info"
-                      @click="editRecord(item)"
-                    />
-                    <Button
-                      icon="pi pi-trash"
-                      severity="danger"
-                      rounded
-                      raised
-                      outlined
-                      aria-label="Cancel"
-                      @click="deleteRecord(item)"
-                    />
+                  <div class="flex align-items-center">
+                    <p class="m-0 text-color capitalize">
+                      {{ formatDate(item.date) }}
+                    </p>
+                    <div class="ml-4 flex gap-2">
+                      <Button
+                        text
+                        raised
+                        rounded
+                        aria-label="Cancel"
+                        icon="pi pi-pencil"
+                        severity="info"
+                        @click="editRecord(item)"
+                      />
+                      <Button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        rounded
+                        raised
+                        outlined
+                        aria-label="Cancel"
+                        @click="deleteRecord(item)"
+                      />
+                    </div>
                   </div>
                 </div>
               </template>
@@ -428,8 +434,6 @@ import { supabase } from '@/supababse'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
 import type { AccountResponseData, RecordsResponseData } from '@/types/response'
-import RadioButton from 'primevue/radiobutton'
-import Divider from 'primevue/divider'
 
 enum RecordType {
   INCOME = 'Income',
