@@ -430,7 +430,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, watchEffect } from 'vue'
-import { supabase } from '@/supababse'
+import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
 import type { AccountResponseData, RecordsResponseData } from '@/types/response'

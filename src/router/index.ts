@@ -3,7 +3,7 @@ import HomeView from '@/views/Home.vue'
 import LoginView from '@/views/Login.vue'
 import AccountDetailView from '@/views/AccountDetail.vue'
 import AboutUsView from '@/views/AboutUs.vue'
-import { supabase } from '@/supababse'
+import { supabase } from '@/supabase'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '@/supababse'
+import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 
 const email = ref('')

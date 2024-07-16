@@ -120,7 +120,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { supabase } from '@/supababse'
+import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import type { AccountResponseData } from '@/types/response'
 
