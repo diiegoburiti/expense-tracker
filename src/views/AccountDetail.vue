@@ -1,290 +1,84 @@
 <template>
   <Toast />
-  <section class="surface-ground h-screen">
-    <div class="pt-5 mx-5">
-      <Card>
-        <template #content>
-          <div>
-            <div class="flex justify-content-between">
-              <div class="flex align-items-center gap-2">
-                <Button
-                  severity="secondary"
-                  icon="pi pi-arrow-circle-left "
-                  aria-label="Go back"
-                  @click="handleGoBack"
-                />
-                <h6 class="m-0 text-lg text-color font-medium">
-                  Account Details
-                </h6>
-              </div>
-              <div class="flex gap-2">
-                <Button
-                  label="Edit"
-                  severity="info"
-                  raised
-                  @click="modalEditAccount = true"
-                />
-                <Button
-                  label="Delete"
-                  severity="danger"
-                  raised
-                  @click="modalConfirmation = true"
-                />
-              </div>
+  <section class="surface-ground">
+    <Card>
+      <template #content>
+        <div>
+          <div class="flex justify-content-between">
+            <div class="flex align-items-center gap-2">
+              <Button
+                severity="secondary"
+                icon="pi pi-arrow-circle-left "
+                aria-label="Go back"
+                @click="handleGoBack"
+              />
+              <h6 class="m-0 text-lg text-color font-medium">
+                Account Details
+              </h6>
             </div>
+            <div class="flex gap-2">
+              <Button
+                label="Edit"
+                severity="info"
+                raised
+                @click="modalEditAccount = true"
+              />
+              <Button
+                label="Delete"
+                severity="danger"
+                raised
+                @click="modalDeleteAccount = true"
+              />
+            </div>
+          </div>
 
-            <div class="mt-4">
-              <span class="text-xs font-medium text-color text-color-secondary"
-                >Account Name</span
-              >
+          <div class="mt-4">
+            <span class="text-xs font-medium text-color text-color-secondary"
+              >Account Name</span
+            >
+            <br />
+            <span v-if="!isLoading" class="text-base">{{
+              accountInfo?.name
+            }}</span>
+            <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
+            <div class="mt-2">
+              <span class="text-xs font-medium text-color-secondary">
+                Account Type
+              </span>
               <br />
-              <span v-if="!isLoading" class="text-base">{{
-                accountInfo?.name
-              }}</span>
+              <span v-if="!isLoading" class="text-base">
+                {{ accountInfo?.type?.name }}
+              </span>
               <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-              <div class="mt-2">
-                <span class="text-xs font-medium text-color-secondary">
-                  Account Type
-                </span>
-                <br />
-                <span v-if="!isLoading" class="text-base">
-                  {{ accountInfo?.type?.name }}
-                </span>
-                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-              </div>
-              <div class="mt-2">
-                <span class="text-xs font-medium text-color-secondary">
-                  Account Month
-                </span>
-                <br />
-                <span v-if="!isLoading" class="text-base">
-                  {{ accountInfo?.monthName }}
-                </span>
-                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-              </div>
+            </div>
+            <div class="mt-2">
+              <span class="text-xs font-medium text-color-secondary">
+                Account Month
+              </span>
+              <br />
+              <span v-if="!isLoading" class="text-base">
+                {{ accountInfo?.monthName }}
+              </span>
+              <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
             </div>
           </div>
-        </template>
-      </Card>
-
-      <div class="flex gap-4 my-4">
-        <Card>
-          <template #title><span class="text-lg">Budget</span></template>
-          <template #content>
-            <span class="m-0 text-color-secondary text-xl font-bold">
-              <span class="font-normal">$</span>
-              {{ accountInfo?.amount }}
-            </span>
-          </template>
-        </Card>
-        <Card>
-          <template #title><span class="text-lg">Expense</span></template>
-          <template #content>
-            <span class="m-0 text-red-500 text-xl font-bold">
-              <span class="font-normal">$</span>
-              {{ expense - income }}
-            </span>
-          </template>
-        </Card>
-
-        <Card>
-          <template #title><span class="text-lg">Balance</span></template>
-          <template #content>
-            <span
-              class="m-0 text-xl font-bold"
-              :class="
-                balance.isBalanceStatusPositive
-                  ? 'text-green-500'
-                  : 'text-red-500'
-              "
-            >
-              <span class="font-normal">$</span>
-              {{ balance.balanceValue }}
-            </span>
-          </template>
-        </Card>
-      </div>
-
-      <div>
-        <h6 class="text-color text-2xl m-0">Transactions</h6>
-        <br />
-        <div v-if="!isLoading">
-          <div v-bind:key="item.id" v-for="item in recordsData">
-            <Card
-              class="mb-3"
-              :style="
-                item['record-type'] === RecordType.INCOME
-                  ? 'border-right: 10px solid var(--green-500)'
-                  : 'border-right: 10px solid var(--red-500)'
-              "
-              :pt="{ body: { class: 'p-2' } }"
-            >
-              <template #content>
-                <div class="flex align-items-center">
-                  <div class="flex align-items-center gap-2 flex-1">
-                    <p class="m-0 text-color capitalize">
-                      {{ item.description }}
-                    </p>
-                    <Chip :label="item.category" class="text-xs" />
-                  </div>
-
-                  <p class="m-0 text-color flex-1">
-                    {{ item.amount }}
-                  </p>
-                  <div class="flex align-items-center">
-                    <p class="m-0 text-color capitalize">
-                      {{ formatDate(item.date) }}
-                    </p>
-                    <div class="ml-4 flex gap-2">
-                      <Button
-                        text
-                        raised
-                        rounded
-                        aria-label="Cancel"
-                        icon="pi pi-pencil"
-                        severity="info"
-                        @click="editRecord(item)"
-                      />
-                      <Button
-                        icon="pi pi-trash"
-                        severity="danger"
-                        rounded
-                        raised
-                        outlined
-                        aria-label="Cancel"
-                        @click="deleteRecord(item)"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </Card>
-          </div>
-          <div v-if="!recordsData?.length">
-            Ops! There are not transitions yet :/
-          </div>
         </div>
-
-        <div v-else class="flex flex-column gap-3">
-          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
-          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
-          <Skeleton width="w-full" height="3.5rem" border-radius=".857rem" />
-        </div>
-      </div>
+      </template>
+    </Card>
+    <div class="mt-4">
+      <TabView>
+        <TabPanel header="Balance">
+          <Charts
+            v-if="!isLoading"
+            :categories="categoriesData"
+            :totalExpensesByCategory="totalExpensesByCategory"
+          />
+        </TabPanel>
+        <TabPanel header="Records">
+          <Records />
+        </TabPanel>
+      </TabView>
     </div>
-
-    <Button
-      class="fixed bottom-0 right-50 font-bold mb-4"
-      icon="pi pi-plus"
-      label="Add"
-      @click="isModalVisible = true"
-    />
-
-    <Dialog
-      v-model:visible="isModalVisible"
-      modal
-      header="Add Record"
-      :style="{ width: '35rem' }"
-    >
-      <form @submit.prevent="addRecord">
-        <div class="flex flex-column gap-2 gap-2 mb-3">
-          <div class="flex align-items-center gap-3">
-            <div>
-              <RadioButton
-                v-model="recordType"
-                inputId="isExpense"
-                name="expense"
-                value="Expense"
-              />
-              <label for="isExpense" class="ml-2">Expense</label>
-            </div>
-
-            <div>
-              <RadioButton
-                v-model="recordType"
-                inputId="isIncome"
-                name="income"
-                value="Income"
-              />
-              <label for="isIncome" class="ml-2">Income</label>
-            </div>
-          </div>
-          <Divider />
-          <div class="flex gap-2">
-            <div>
-              <label for="record-name" class="text-sm">Record name</label>
-              <InputText
-                id="record-name"
-                class="flex-auto"
-                autocomplete="off"
-                placeholder="Give a name for your record"
-                v-model="expenseName"
-              />
-            </div>
-
-            <div>
-              <label for="locale-us" class="text-sm">Amount</label>
-              <InputNumber
-                v-model="expenseValue"
-                inputId="locale-us"
-                locale="en-US"
-                :minFractionDigits="1"
-                placeholder="Amount value"
-              />
-            </div>
-          </div>
-
-          <div class="flex align-items-center gap-2 grid-nogutter">
-            <div class="col">
-              <label for="record-type" class="text-sm mb-2">Expense type</label>
-              <Dropdown
-                filter
-                class="w-full"
-                inputId="record-type"
-                v-model="category"
-                :options="categories"
-                optionLabel="name"
-                placeholder="Select a category"
-              />
-            </div>
-
-            <div class="flex-1">
-              <label for="record-data" class="text-sm">Date</label>
-              <Calendar
-                inputId="record-data"
-                showIcon
-                iconDisplay="input"
-                class="w-full"
-                placeholder="Select a date"
-                dateFormat="dd/mm/yy"
-                v-model="expenseDate"
-              />
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-content-center mt-5">
-          <Button label="Add Record" class="w-6" type="submit" />
-        </div>
-      </form>
-    </Dialog>
-
-    <Dialog
-      header="Delete Account"
-      class="w-25rem"
-      modal
-      v-model:visible="modalConfirmation"
-      :draggable="false"
-    >
-      <span>Are you sure you want to delete this account?</span>
-      <div class="mt-4 flex gap-4">
-        <Button
-          label="Cancel"
-          severity="info"
-          @click="modalConfirmation = false"
-        />
-        <Button label="Delete" severity="danger" @click="deleteAccount" />
-      </div>
-    </Dialog>
 
     <Dialog
       header="Edit Account"
@@ -358,104 +152,39 @@
         </div>
       </form>
     </Dialog>
+
     <Dialog
-      header="Edit Record"
+      header="Delete Account"
       class="w-25rem"
       modal
-      v-model:visible="editingRecord"
+      v-model:visible="modalDeleteAccount"
       :draggable="false"
     >
-      <form @submit.prevent="handleEditRecord">
-        <div class="flex flex-column gap-2 gap-2 mb-3">
-          <label for="record-name" class="text-sm">Record name</label>
-          <InputText
-            id="record-name"
-            class="flex-auto"
-            autocomplete="off"
-            placeholder="Type the account name"
-            v-model="recordToBeEdited.description"
-            required
-          />
-
-          <label for="record-value" class="text-sm">Record value</label>
-          <InputNumber
-            inputId="record-value"
-            locale="en-US"
-            :minFractionDigits="1"
-            required
-            v-model="recordToBeEdited.amount"
-          />
-
-          <label for="record-data" class="text-sm">Date</label>
-          <Calendar
-            id="record-data"
-            showIcon
-            iconDisplay="input"
-            class="w-full"
-            placeholder="Select a date"
-            dateFormat="dd/mm/yy"
-            v-model="newRecordDate"
-          />
-        </div>
-
-        <div class="flex mt-5">
-          <Button
-            label="Save"
-            class="w-full"
-            type="submit"
-            @click="editingRecord = false"
-          />
-        </div>
-      </form>
-    </Dialog>
-    <Dialog
-      header="Delete Record"
-      class="w-25rem"
-      modal
-      v-model:visible="showDeleteRecord"
-      :draggable="false"
-    >
-      <span>Are you sure you want to delete this record?</span>
+      <span>Are you sure you want to delete this account?</span>
       <div class="mt-4 flex gap-4">
         <Button
           label="Cancel"
           severity="info"
-          @click="showDeleteRecord = false"
+          @click="modalDeleteAccount = false"
         />
-        <Button label="Delete" severity="danger" @click="handleDeleteRecord" />
+        <Button label="Delete" severity="danger" @click="deleteAccount" />
       </div>
     </Dialog>
   </section>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, watchEffect } from 'vue'
+import { onMounted, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
-import type { AccountResponseData, RecordsResponseData } from '@/types/response'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
 
-enum RecordType {
-  INCOME = 'Income',
-  EXPENSE = 'Expense'
-}
+import Charts from '@/components/Charts.vue'
+import Records from '@/components/Records.vue'
 
-const categories = [
-  { name: 'Food' },
-  { name: 'Shopping' },
-  { name: 'House' },
-  { name: 'Vehicle' },
-  { name: 'Life & Entertainment' },
-  { name: 'Communication & PC' },
-  { name: 'Financial Expenses' },
-  { name: 'Health' },
-  { name: 'Sports' },
-  { name: 'Fitness' },
-  { name: 'Wellness' },
-  { name: 'Income' },
-  { name: 'Others' },
-  { name: 'Refund' }
-]
+import type { AccountResponseData } from '@/types/response'
 
 const optionsForAccountType = [
   { name: 'General', category: 'general', icon: 'pi pi-wallet' },
@@ -485,21 +214,12 @@ const optionsForAccountMonth = [
 const toast = useToast()
 const router = useRouter()
 const route = useRoute()
-const category = ref()
-const isModalVisible = ref(false)
-const modalConfirmation = ref(false)
+const modalDeleteAccount = ref(false)
 const modalEditAccount = ref(false)
 const showDeleteRecord = ref(false)
-const expenseName = ref()
-const expenseValue = ref()
-const expenseDate = ref()
-const recordsData = ref<RecordsResponseData[]>()
+const categoriesData = ref()
 const accountInfo = ref<AccountResponseData>({} as AccountResponseData)
 const isLoading = ref(false)
-const editingRecord = ref(false)
-const recordToBeEdited = ref<RecordsResponseData>({} as RecordsResponseData)
-const recordToBeDeleted = ref<RecordsResponseData>({} as RecordsResponseData)
-const newRecordDate = ref()
 const accountName = ref()
 const accountAmount = ref()
 const accountMonth = ref({ name: '' })
@@ -508,96 +228,12 @@ const accountType = ref({
   category: '',
   icon: ''
 })
-const recordType = ref('Expense')
+
+const totalExpensesByCategory = ref({})
 const monthId = Number(route.params.id)
 
 const handleGoBack = () => {
   router.push({ name: 'home' })
-}
-
-const formatDate = (date: string) => {
-  if (!date) return ''
-  const [year, month, day] = date.substring(0, 10).split('-')
-  return `${day}/${month}/${year}`
-}
-
-const expense = computed(() => {
-  const expenseRecords =
-    recordsData.value?.filter(
-      (record) => record['record-type'] === RecordType.EXPENSE
-    ) || []
-
-  const totalAmount = expenseRecords.reduce(
-    (acc, currentValue) => acc + currentValue.amount,
-    0
-  )
-
-  return Number(totalAmount.toFixed())
-})
-
-const income = computed(() => {
-  const incomeRecords =
-    recordsData.value?.filter(
-      (record) => record['record-type'] === RecordType.INCOME
-    ) || []
-
-  const totalIncome = incomeRecords.reduce(
-    (acc, currentValue) => acc + currentValue.amount,
-    0
-  )
-
-  return Number(totalIncome.toFixed())
-})
-
-const balance = computed(() => {
-  const accountAmount = accountInfo.value.amount || 0
-  const balanceValue = accountAmount + income.value - expense.value
-
-  return {
-    balanceValue: balanceValue,
-    isBalanceStatusPositive: balanceValue >= 0
-  }
-})
-
-const addRecord = async () => {
-  try {
-    const { error } = await supabase.from('records').insert([
-      {
-        amount: expenseValue.value,
-        month_id: monthId,
-        description: expenseName.value,
-        category: category.value.name,
-        date: expenseDate.value,
-        'record-type': recordType.value as RecordType
-      }
-    ])
-
-    if (error) {
-      return toast.add({
-        severity: 'error',
-        summary: 'Ops!',
-        detail: error.message,
-        life: 3000
-      })
-    }
-
-    isModalVisible.value = false
-
-    toast.add({
-      severity: 'success',
-      summary: 'Yeah!',
-      detail: 'Record added with success',
-      life: 3000
-    })
-    return await fetchRecords()
-  } catch (error) {
-    console.error(error)
-  } finally {
-    expenseValue.value = ''
-    expenseName.value = ''
-    category.value = ''
-    expenseDate.value = ''
-  }
 }
 
 const deleteAccount = async () => {
@@ -612,35 +248,6 @@ const deleteAccount = async () => {
     })
     showDeleteRecord.value = false
     handleGoBack()
-  }
-}
-
-const deleteRecord = (item: RecordsResponseData) => {
-  recordToBeDeleted.value = item
-  showDeleteRecord.value = true
-}
-
-const handleDeleteRecord = async () => {
-  const recordId = recordToBeDeleted.value.id
-
-  try {
-    const { status } = await supabase
-      .from('records')
-      .delete()
-      .eq('id', recordId)
-
-    if (status === 204) {
-      toast.add({
-        severity: 'success',
-        summary: 'Record Deleted!!',
-        detail: 'The record was deleted!!',
-        life: 3000
-      })
-      await fetchRecords()
-      showDeleteRecord.value = false
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error)
   }
 }
 
@@ -677,63 +284,28 @@ const handleEditAccount = async () => {
   } catch (error) {
     console.error(error)
   } finally {
-    modalConfirmation.value = false
+    modalDeleteAccount.value = false
   }
 }
 
-const editRecord = (item: RecordsResponseData) => {
-  recordToBeEdited.value = item
-  newRecordDate.value = formatDate(item.date)
-  editingRecord.value = true
-}
-
-const handleEditRecord = async () => {
-  const { id, description, amount, category } = recordToBeEdited.value
-  try {
-    const { status } = await supabase
-      .from('records')
-      .update({
-        date: newRecordDate.value,
-        id: id,
-        description,
-        amount,
-        category
-      })
-      .eq('id', recordToBeEdited.value!.id)
-      .select()
-
-    if (status === 200) {
-      toast.add({
-        severity: 'success',
-        summary: 'Record Edited!!',
-        detail: 'The record was edited with success!!',
-        life: 3000
-      })
-      await fetchRecords()
-    }
-  } catch (error) {
-    console.error(error)
-  }
-}
-
-const fetchRecords = async () => {
+const fetchCategories = async () => {
   isLoading.value = true
 
   try {
-    const { data: recordsDataResponse, error: recordsError } = await supabase
-      .from('records')
+    const { data: categoriesResponse, error: categoriesError } = await supabase
+      .from('category_view')
       .select('*')
-      .eq('month_id', monthId)
-      .order('date', { ascending: false })
 
-    if (recordsError) {
+    if (categoriesError) {
       return toast.add({
         severity: 'error',
-        summary: recordsError.message,
+        summary: categoriesError.message,
         life: 3000
       })
     }
-    recordsData.value = recordsDataResponse
+    categoriesData.value = categoriesResponse.map(
+      (category) => category.category
+    )
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
@@ -774,12 +346,38 @@ const fetchAccountInfo = async () => {
   }
 }
 
-watchEffect(() => {
-  console.log({ income })
-})
+const fetchExpenses = async () => {
+  isLoading.value = true
+  try {
+    const { data: expenses, error } = await supabase
+      .from('records')
+      .select('category, amount')
+      .eq('month_id', monthId)
+
+    if (error) {
+      console.error('Error fetching expenses:', error.message)
+      return
+    }
+
+    const categoryTotals = {}
+    expenses.forEach((expense) => {
+      const { category, amount } = expense
+      categoryTotals[category] = (categoryTotals[category] || 0) + amount
+    })
+
+    totalExpensesByCategory.value = categoryTotals
+
+    console.log('Total expenses per category:', categoryTotals)
+  } catch (error) {
+    console.error('Error fetching expenses:', error.message)
+  } finally {
+    isLoading.value = false
+  }
+}
 
 onMounted(async () => {
   await fetchAccountInfo()
-  await fetchRecords()
+  await fetchCategories()
+  await fetchExpenses()
 })
 </script>
