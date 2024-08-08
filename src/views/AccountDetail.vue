@@ -1,179 +1,235 @@
 <template>
   <Toast />
   <section class="surface-ground">
-    <Card>
-      <template #content>
-        <div>
-          <div class="flex justify-content-between">
-            <div class="flex align-items-center gap-2">
-              <Button
-                severity="secondary"
-                icon="pi pi-arrow-circle-left "
-                aria-label="Go back"
-                @click="handleGoBack"
-              />
-              <h6 class="m-0 text-lg text-color font-medium">
-                Account Details
-              </h6>
+    <div class="mx-5 pt-5">
+      <Card>
+        <template #content>
+          <div>
+            <div class="flex justify-content-between">
+              <div class="flex align-items-center gap-2">
+                <Button
+                  severity="secondary"
+                  icon="pi pi-arrow-circle-left "
+                  aria-label="Go back"
+                  @click="handleGoBack"
+                />
+                <h6 class="m-0 text-lg text-color font-medium">
+                  Account Details
+                </h6>
+              </div>
+              <div class="flex gap-2">
+                <Button
+                  label="Edit"
+                  severity="info"
+                  raised
+                  @click="modalEditAccount = true"
+                />
+                <Button
+                  label="Delete"
+                  severity="danger"
+                  raised
+                  @click="modalDeleteAccount = true"
+                />
+              </div>
             </div>
-            <div class="flex gap-2">
-              <Button
-                label="Edit"
-                severity="info"
-                raised
-                @click="modalEditAccount = true"
-              />
-              <Button
-                label="Delete"
-                severity="danger"
-                raised
-                @click="modalDeleteAccount = true"
-              />
+
+            <div class="mt-4">
+              <span class="text-xs font-medium text-color text-color-secondary"
+                >Account Name</span
+              >
+              <br />
+              <span v-if="!isLoading" class="text-base">{{
+                accountInfo?.name
+              }}</span>
+              <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
+              <div class="mt-2">
+                <span class="text-xs font-medium text-color-secondary">
+                  Account Type
+                </span>
+                <br />
+                <span v-if="!isLoading" class="text-base">
+                  {{ accountInfo?.type?.name }}
+                </span>
+                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
+              </div>
+              <div class="mt-2">
+                <span class="text-xs font-medium text-color-secondary">
+                  Account Month
+                </span>
+                <br />
+                <span v-if="!isLoading" class="text-base">
+                  {{ accountInfo?.monthName }}
+                </span>
+                <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
+              </div>
             </div>
           </div>
+        </template>
+      </Card>
 
-          <div class="mt-4">
-            <span class="text-xs font-medium text-color text-color-secondary"
-              >Account Name</span
+      <div class="flex gap-4 my-4">
+        <Card>
+          <template #title><span class="text-lg">Budget</span></template>
+          <template #content>
+            <span class="m-0 text-color-secondary text-xl font-bold">
+              <span class="font-normal">$</span>
+              {{ accountInfo?.amount }}
+            </span>
+          </template>
+        </Card>
+        <Card>
+          <template #title><span class="text-lg">Expense</span></template>
+          <template #content>
+            <span class="m-0 text-red-500 text-xl font-bold">
+              <span class="font-normal">$</span>
+              {{ expense - income }}
+            </span>
+          </template>
+        </Card>
+
+        <Card>
+          <template #title><span class="text-lg">Balance</span></template>
+          <template #content>
+            <span
+              class="m-0 text-xl font-bold"
+              :class="
+                balance.isBalanceStatusPositive
+                  ? 'text-green-500'
+                  : 'text-red-500'
+              "
             >
-            <br />
-            <span v-if="!isLoading" class="text-base">{{
-              accountInfo?.name
-            }}</span>
-            <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-            <div class="mt-2">
-              <span class="text-xs font-medium text-color-secondary">
-                Account Type
-              </span>
-              <br />
-              <span v-if="!isLoading" class="text-base">
-                {{ accountInfo?.type?.name }}
-              </span>
-              <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-            </div>
-            <div class="mt-2">
-              <span class="text-xs font-medium text-color-secondary">
-                Account Month
-              </span>
-              <br />
-              <span v-if="!isLoading" class="text-base">
-                {{ accountInfo?.monthName }}
-              </span>
-              <Skeleton v-if="isLoading" height="1.2rem" width="8rem" />
-            </div>
-          </div>
-        </div>
-      </template>
-    </Card>
-    <div class="mt-4">
-      <TabView>
-        <TabPanel header="Balance">
-          <Charts
-            v-if="!isLoading"
-            :totalExpensesByCategory="totalExpensesByCategory"
-          />
-        </TabPanel>
-        <TabPanel header="Records">
-          <Records />
-        </TabPanel>
-      </TabView>
-    </div>
-
-    <Dialog
-      header="Edit Account"
-      class="w-25rem"
-      modal
-      v-model:visible="modalEditAccount"
-      :draggable="false"
-    >
-      <form @submit.prevent="handleEditAccount">
-        <div class="flex flex-column gap-2 gap-2 mb-3">
-          <label for="account-name" class="text-sm">Account name</label>
-          <InputText
-            id="account-name"
-            class="flex-auto"
-            autocomplete="off"
-            placeholder="Type the account name"
-            v-model="accountName"
-          />
-          <label for="account-month" class="text-sm">Account month</label>
-
-          <Dropdown
-            id="account-month"
-            class="w-full"
-            showClear
-            optionLabel="name"
-            placeholder="Choose a Month"
-            :options="optionsForAccountMonth"
-            v-model="accountMonth"
-          >
-            <template #option="slotProps">
-              <div class="flex align-items-center gap-2">
-                <i :class="slotProps.option.icon" />
-                <div>{{ slotProps.option.name }}</div>
-              </div>
-            </template>
-          </Dropdown>
-          <label for="account-type" class="text-sm">Account type</label>
-          <Dropdown
-            id="account-type"
-            class="w-full"
-            checkmark
-            showClear
-            optionLabel="name"
-            placeholder="Select a type for your account"
-            v-model="accountType"
-            :options="optionsForAccountType"
-          >
-            <template #option="slotProps">
-              <div class="flex align-items-center gap-2">
-                <i :class="slotProps.option.icon" />
-                <div>{{ slotProps.option.name }}</div>
-              </div>
-            </template>
-          </Dropdown>
-          <label for="starting-amount" class="text-sm">Starting Amount</label>
-          <InputNumber
-            id="starting-amount"
-            inputId="locale-user"
-            v-model="accountAmount"
-            required
-          />
-        </div>
-
-        <div class="flex mt-5">
-          <Button
-            label="Save"
-            class="w-full"
-            type="submit"
-            @click="modalEditAccount = false"
-          />
-        </div>
-      </form>
-    </Dialog>
-
-    <Dialog
-      header="Delete Account"
-      class="w-25rem"
-      modal
-      v-model:visible="modalDeleteAccount"
-      :draggable="false"
-    >
-      <span>Are you sure you want to delete this account?</span>
-      <div class="mt-4 flex gap-4">
-        <Button
-          label="Cancel"
-          severity="info"
-          @click="modalDeleteAccount = false"
-        />
-        <Button label="Delete" severity="danger" @click="deleteAccount" />
+              <span class="font-normal">$</span>
+              {{ balance.balanceValue }}
+            </span>
+          </template>
+        </Card>
       </div>
-    </Dialog>
+      <div class="mt-4">
+        <Card class="p-o m-0" :pt="{ body: { class: 'p-0' } }">
+          <template #content>
+            <TabView
+              :pt="{
+                root: {
+                  class: 'p-0 m-0'
+                },
+                nav: {
+                  class: 'border-round-top-xl justify-content-center'
+                },
+                panelcontainer: {
+                  class: 'p-0 m-0'
+                }
+              }"
+            >
+              <TabPanel header="Balance">
+                <Charts
+                  v-if="!isLoading"
+                  :totalExpensesByCategory="totalExpensesByCategory"
+                />
+              </TabPanel>
+              <TabPanel header="Records">
+                <Records />
+              </TabPanel>
+            </TabView>
+          </template>
+        </Card>
+      </div>
+
+      <Dialog
+        header="Edit Account"
+        class="w-25rem"
+        modal
+        v-model:visible="modalEditAccount"
+        :draggable="false"
+      >
+        <form @submit.prevent="handleEditAccount">
+          <div class="flex flex-column gap-2 gap-2 mb-3">
+            <label for="account-name" class="text-sm">Account name</label>
+            <InputText
+              id="account-name"
+              class="flex-auto"
+              autocomplete="off"
+              placeholder="Type the account name"
+              v-model="accountName"
+            />
+            <label for="account-month" class="text-sm">Account month</label>
+
+            <Dropdown
+              id="account-month"
+              class="w-full"
+              showClear
+              optionLabel="name"
+              placeholder="Choose a Month"
+              :options="optionsForAccountMonth"
+              v-model="accountMonth"
+            >
+              <template #option="slotProps">
+                <div class="flex align-items-center gap-2">
+                  <i :class="slotProps.option.icon" />
+                  <div>{{ slotProps.option.name }}</div>
+                </div>
+              </template>
+            </Dropdown>
+            <label for="account-type" class="text-sm">Account type</label>
+            <Dropdown
+              id="account-type"
+              class="w-full"
+              checkmark
+              showClear
+              optionLabel="name"
+              placeholder="Select a type for your account"
+              v-model="accountType"
+              :options="optionsForAccountType"
+            >
+              <template #option="slotProps">
+                <div class="flex align-items-center gap-2">
+                  <i :class="slotProps.option.icon" />
+                  <div>{{ slotProps.option.name }}</div>
+                </div>
+              </template>
+            </Dropdown>
+            <label for="starting-amount" class="text-sm">Starting Amount</label>
+            <InputNumber
+              id="starting-amount"
+              inputId="locale-user"
+              v-model="accountAmount"
+              required
+            />
+          </div>
+
+          <div class="flex mt-5">
+            <Button
+              label="Save"
+              class="w-full"
+              type="submit"
+              @click="modalEditAccount = false"
+            />
+          </div>
+        </form>
+      </Dialog>
+
+      <Dialog
+        header="Delete Account"
+        class="w-25rem"
+        modal
+        v-model:visible="modalDeleteAccount"
+        :draggable="false"
+      >
+        <span>Are you sure you want to delete this account?</span>
+        <div class="mt-4 flex gap-4">
+          <Button
+            label="Cancel"
+            severity="info"
+            @click="modalDeleteAccount = false"
+          />
+          <Button label="Delete" severity="danger" @click="deleteAccount" />
+        </div>
+      </Dialog>
+    </div>
   </section>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
@@ -183,7 +239,7 @@ import TabPanel from 'primevue/tabpanel'
 import Charts from '@/components/Charts.vue'
 import Records from '@/components/Records.vue'
 
-import type { AccountResponseData } from '@/types/response'
+import type { AccountResponseData, RecordsResponseData } from '@/types/response'
 
 const optionsForAccountType = [
   { name: 'General', category: 'general', icon: 'pi pi-wallet' },
@@ -229,6 +285,8 @@ const accountType = ref({
 
 const totalExpensesByCategory = ref({})
 const monthId = Number(route.params.id)
+
+const records = ref<RecordsResponseData[]>()
 
 const handleGoBack = () => {
   router.push({ name: 'home' })
@@ -324,7 +382,7 @@ const fetchExpenses = async () => {
   try {
     const { data: expenses, error } = await supabase
       .from('records')
-      .select('category, amount')
+      .select('*')
       .eq('month_id', monthId)
 
     if (error) {
@@ -337,6 +395,7 @@ const fetchExpenses = async () => {
     }
 
     const categoryTotals: CategoryTotals = {}
+    records.value = expenses
     expenses.forEach((expense) => {
       const { category, amount } = expense
       categoryTotals[category] = (categoryTotals[category] || 0) + amount
@@ -349,6 +408,48 @@ const fetchExpenses = async () => {
     isLoading.value = false
   }
 }
+
+enum RecordType {
+  INCOME = 'Income',
+  EXPENSE = 'Expense'
+}
+const expense = computed(() => {
+  const expenseRecords =
+    records.value?.filter(
+      (record) => record['record-type'] === RecordType.EXPENSE
+    ) || []
+
+  const totalAmount = expenseRecords.reduce(
+    (acc, currentValue) => acc + currentValue.amount,
+    0
+  )
+
+  return Number(totalAmount.toFixed())
+})
+
+const income = computed(() => {
+  const incomeRecords =
+    records.value?.filter(
+      (record) => record['record-type'] === RecordType.INCOME
+    ) || []
+
+  const totalIncome = incomeRecords.reduce(
+    (acc, currentValue) => acc + currentValue.amount,
+    0
+  )
+
+  return Number(totalIncome.toFixed())
+})
+
+const balance = computed(() => {
+  const accountAmount = accountInfo.value.amount || 0
+  const balanceValue = accountAmount + income.value - expense.value
+
+  return {
+    balanceValue: balanceValue,
+    isBalanceStatusPositive: balanceValue >= 0
+  }
+})
 
 onMounted(async () => {
   await fetchAccountInfo()
