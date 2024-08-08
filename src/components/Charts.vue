@@ -4,33 +4,34 @@
       type="doughnut"
       :data="chartData"
       :options="chartOptions"
-      class="w-full"
+      class="w-full md:w-30rem"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, defineProps, watchEffect } from 'vue'
 import Chart from 'primevue/chart'
-import type { CategoryType } from '@/types/response'
 
-const props = defineProps({
-  categories: {
-    type: Array<CategoryType>,
-    required: true
-  },
-  totalExpensesByCategory: {
-    required: true
-  }
+type CategoryTotals = {
+  [category: string]: number
+}
+
+const props = defineProps<{
+  totalExpensesByCategory: CategoryTotals
+}>()
+
+const chartData = ref()
+const chartOptions = ref()
+
+const categories = computed(() => {
+  const expenses = props.totalExpensesByCategory ?? {}
+  return Object.keys(expenses).map((category) => category)
 })
 
-const chartData = ref(null)
-const chartOptions = ref(null)
-
 const chartValues = computed(() => {
-  return props.categories?.map(
-    (category) => props.totalExpensesByCategory[category]
-  )
+  const expenses = props.totalExpensesByCategory ?? {}
+  return categories.value.map((category) => expenses[category])
 })
 
 const setChartData = () => {
@@ -55,12 +56,12 @@ const setChartData = () => {
   ]
 
   return {
-    labels: props.categories,
+    labels: categories.value,
     datasets: [
       {
         data: chartValues,
-        backgroundColor: colors.slice(0, props.categories?.length),
-        hoverBackgroundColor: hoverColors.slice(0, props.categories?.length)
+        backgroundColor: colors.slice(0, categories.value?.length),
+        hoverBackgroundColor: hoverColors.slice(0, categories.value?.length)
       }
     ]
   }
@@ -85,5 +86,10 @@ const setChartOptions = () => {
 onMounted(() => {
   chartData.value = setChartData()
   chartOptions.value = setChartOptions()
+})
+
+watchEffect(() => {
+  console.log({ chartValues: chartValues })
+  console.log({ categories: categories.value })
 })
 </script>

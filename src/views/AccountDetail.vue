@@ -70,7 +70,6 @@
         <TabPanel header="Balance">
           <Charts
             v-if="!isLoading"
-            :categories="categoriesData"
             :totalExpensesByCategory="totalExpensesByCategory"
           />
         </TabPanel>
@@ -217,7 +216,6 @@ const route = useRoute()
 const modalDeleteAccount = ref(false)
 const modalEditAccount = ref(false)
 const showDeleteRecord = ref(false)
-const categoriesData = ref()
 const accountInfo = ref<AccountResponseData>({} as AccountResponseData)
 const isLoading = ref(false)
 const accountName = ref()
@@ -288,31 +286,6 @@ const handleEditAccount = async () => {
   }
 }
 
-const fetchCategories = async () => {
-  isLoading.value = true
-
-  try {
-    const { data: categoriesResponse, error: categoriesError } = await supabase
-      .from('category_view')
-      .select('*')
-
-    if (categoriesError) {
-      return toast.add({
-        severity: 'error',
-        summary: categoriesError.message,
-        life: 3000
-      })
-    }
-    categoriesData.value = categoriesResponse.map(
-      (category) => category.category
-    )
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
 const fetchAccountInfo = async () => {
   isLoading.value = true
 
@@ -359,17 +332,19 @@ const fetchExpenses = async () => {
       return
     }
 
-    const categoryTotals = {}
+    type CategoryTotals = {
+      [category: string]: number
+    }
+
+    const categoryTotals: CategoryTotals = {}
     expenses.forEach((expense) => {
       const { category, amount } = expense
       categoryTotals[category] = (categoryTotals[category] || 0) + amount
     })
 
     totalExpensesByCategory.value = categoryTotals
-
-    console.log('Total expenses per category:', categoryTotals)
   } catch (error) {
-    console.error('Error fetching expenses:', error.message)
+    console.error(error)
   } finally {
     isLoading.value = false
   }
@@ -377,7 +352,6 @@ const fetchExpenses = async () => {
 
 onMounted(async () => {
   await fetchAccountInfo()
-  await fetchCategories()
   await fetchExpenses()
 })
 </script>
