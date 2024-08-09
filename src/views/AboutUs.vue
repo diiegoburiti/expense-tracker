@@ -1,5 +1,5 @@
 <template>
-  <section class="h-screen surface-ground py-4">
+  <section class="h-screen py-4">
     <p class="pt-5 mx-5 text-4xl text-color">
       Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
       tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
