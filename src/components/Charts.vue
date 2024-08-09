@@ -2,9 +2,9 @@
   <div class="card flex justify-content-center">
     <Chart
       type="doughnut"
+      class="w-full md:w-30rem"
       :data="chartData"
       :options="chartOptions"
-      class="w-full md:w-30rem"
     />
   </div>
 </template>

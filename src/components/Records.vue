@@ -1,45 +1,7 @@
 <template>
   <Toast />
-  <section class="">
+  <section>
     <div class="pt-5 mx-5">
-      <div class="flex gap-4 my-4">
-        <Card>
-          <template #title><span class="text-lg">Budget</span></template>
-          <template #content>
-            <span class="m-0 text-color-secondary text-xl font-bold">
-              <span class="font-normal">$</span>
-              {{ accountInfo?.amount }}
-            </span>
-          </template>
-        </Card>
-        <Card>
-          <template #title><span class="text-lg">Expense</span></template>
-          <template #content>
-            <span class="m-0 text-red-500 text-xl font-bold">
-              <span class="font-normal">$</span>
-              {{ expense - income }}
-            </span>
-          </template>
-        </Card>
-
-        <Card>
-          <template #title><span class="text-lg">Balance</span></template>
-          <template #content>
-            <span
-              class="m-0 text-xl font-bold"
-              :class="
-                balance.isBalanceStatusPositive
-                  ? 'text-green-500'
-                  : 'text-red-500'
-              "
-            >
-              <span class="font-normal">$</span>
-              {{ balance.balanceValue }}
-            </span>
-          </template>
-        </Card>
-      </div>
-
       <div>
         <h6 class="text-color text-2xl m-0">Transactions</h6>
         <br />
@@ -274,7 +236,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute } from 'vue-router'
@@ -333,44 +295,6 @@ const formatDate = (date: string) => {
   const [year, month, day] = date.substring(0, 10).split('-')
   return `${day}/${month}/${year}`
 }
-
-const expense = computed(() => {
-  const expenseRecords =
-    recordsData.value?.filter(
-      (record) => record['record-type'] === RecordType.EXPENSE
-    ) || []
-
-  const totalAmount = expenseRecords.reduce(
-    (acc, currentValue) => acc + currentValue.amount,
-    0
-  )
-
-  return Number(totalAmount.toFixed())
-})
-
-const income = computed(() => {
-  const incomeRecords =
-    recordsData.value?.filter(
-      (record) => record['record-type'] === RecordType.INCOME
-    ) || []
-
-  const totalIncome = incomeRecords.reduce(
-    (acc, currentValue) => acc + currentValue.amount,
-    0
-  )
-
-  return Number(totalIncome.toFixed())
-})
-
-const balance = computed(() => {
-  const accountAmount = accountInfo.value.amount || 0
-  const balanceValue = accountAmount + income.value - expense.value
-
-  return {
-    balanceValue: balanceValue,
-    isBalanceStatusPositive: balanceValue >= 0
-  }
-})
 
 const addRecord = async () => {
   try {
