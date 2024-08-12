@@ -242,12 +242,8 @@ import { computed, onMounted, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute, useRouter } from 'vue-router'
-import TabView from 'primevue/tabview'
-import TabPanel from 'primevue/tabpanel'
-
 import Charts from '@/components/Charts.vue'
 import Records from '@/components/Records.vue'
-
 import type { AccountResponseData, RecordsResponseData } from '@/types/response'
 
 const optionsForAccountType = [
