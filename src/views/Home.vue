@@ -186,7 +186,7 @@ const registerAccount = async () => {
       return await fetchAccounts()
     }
   } catch (error: any) {
-    console.log(error.message)
+    console.error(error.message)
   }
 }
 
@@ -207,7 +207,7 @@ const fetchAccounts = async () => {
       })
     }
   } catch (error: any) {
-    console.log(error.message)
+    console.error(error.message)
   } finally {
     loadingData.value = false
   }

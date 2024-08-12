@@ -18,6 +18,9 @@ import Calendar from 'primevue/calendar'
 import RadioButton from 'primevue/radiobutton'
 import Divider from 'primevue/divider'
 import Chip from 'primevue/chip'
+import TabView from 'primevue/tabview'
+import TabPanel from 'primevue/tabpanel'
+import Chart from 'primevue/chart'
 
 import App from './App.vue'
 import router from './router'
@@ -49,5 +52,8 @@ app.component('Calendar', Calendar)
 app.component('RadioButton', RadioButton)
 app.component('Divider', Divider)
 app.component('Chip', Chip)
+app.component('TabView', TabView)
+app.component('TabPanel', TabPanel)
+app.component('Chart', Chart)
 
 app.mount('#app')

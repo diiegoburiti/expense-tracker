@@ -21,3 +21,7 @@ export type RecordsResponseData = {
   month_id: number | null
   'record-type': 'Income' | 'Expense' | null
 }
+
+export type CategoryTotals = {
+  [category: string]: number
+}

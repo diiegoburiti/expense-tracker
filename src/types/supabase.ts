@@ -39,25 +39,25 @@ export type Database = {
           description: string
           id: number
           month_id: number | null
-          'record-type': Database['public']['Enums']['record-type'] | null
+          'record-type': Database['public']['Enums']['record-type']
         }
         Insert: {
           amount: number
           category: string
-          date: string
+          date?: string
           description: string
           id?: number
           month_id?: number | null
-          'record-type'?: Database['public']['Enums']['record-type'] | null
+          'record-type': Database['public']['Enums']['record-type']
         }
         Update: {
           amount?: number
           category?: string
-          date: string
-          description: string
+          date?: string
+          description?: string
           id?: number
           month_id?: number | null
-          'record-type'?: Database['public']['Enums']['record-type'] | null
+          'record-type'?: Database['public']['Enums']['record-type']
         }
         Relationships: [
           {
@@ -71,7 +71,12 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      category_view: {
+        Row: {
+          category: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

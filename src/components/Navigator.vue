@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex justify-content-between px-4 py-1 border-1 border-solid surface-border border-round-lg"
+    class="flex justify-content-between px-4 py-1 border-1 border-solid surface-border bg-white"
   >
     <div class="flex align-items-center gap-2">
       <i class="pi pi-money-bill" style="font-size: 2rem" />
