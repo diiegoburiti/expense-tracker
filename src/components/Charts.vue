@@ -1,7 +1,14 @@
 <template>
-  <div class="card flex justify-content-center">
+  <div class="card flex justify-content-center gap-5">
     <Chart
       type="doughnut"
+      class="w-full md:w-30rem"
+      :data="chartData"
+      :options="chartOptions"
+    />
+
+    <Chart
+      type="pie"
       class="w-full md:w-30rem"
       :data="chartData"
       :options="chartOptions"
@@ -10,7 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, defineProps, watchEffect } from 'vue'
+import { ref, onMounted, computed, defineProps } from 'vue'
 import Chart from 'primevue/chart'
 
 type CategoryTotals = {
@@ -86,10 +93,5 @@ const setChartOptions = () => {
 onMounted(() => {
   chartData.value = setChartData()
   chartOptions.value = setChartOptions()
-})
-
-watchEffect(() => {
-  console.log({ chartValues: chartValues })
-  console.log({ categories: categories.value })
 })
 </script>
