@@ -17,8 +17,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, computed, defineProps } from 'vue'
-import Chart from 'primevue/chart'
+import { ref, onMounted, computed } from 'vue'
 
 type CategoryTotals = {
   [category: string]: number
