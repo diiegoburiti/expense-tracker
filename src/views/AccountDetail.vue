@@ -107,6 +107,7 @@
       <Card class="p-o m-0 mb-4" :pt="{ body: { class: 'p-0' } }">
         <template #content>
           <TabView
+            lazy
             :pt="{
               root: {
                 class: 'p-0 m-0'
