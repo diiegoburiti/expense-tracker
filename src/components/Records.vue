@@ -3,7 +3,10 @@
   <section>
     <div class="pt-5 mx-5">
       <div>
-        <h6 class="text-color text-2xl m-0">Transactions</h6>
+        <div>
+          <h6 class="text-color text-2xl m-0">Transactions</h6>
+          <Button @click="handleDownload">Download</Button>
+        </div>
         <br />
         <div v-if="!isLoading">
           <div v-bind:key="item.id" v-for="item in recordsData">
@@ -456,6 +459,38 @@ const fetchAccountInfo = async () => {
     console.error('Error fetching data:', error)
   } finally {
     isLoading.value = false
+  }
+}
+
+const handleDownload = async () => {
+  try {
+    const { data: csvData, error: csvError } = await supabase
+      .from('records')
+      .select('*')
+      .eq('month_id', monthId)
+      .csv()
+
+    if (csvError) {
+      return toast.add({
+        severity: 'error',
+        summary: csvError.message,
+        life: 3000
+      })
+    }
+
+    const csvContent = csvData
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+
+    if (link.download !== undefined) {
+      const url = URL.createObjectURL(blob)
+      link.setAttribute('href', url)
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
+  } catch (error) {
+    console.error(error)
   }
 }
 
