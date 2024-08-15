@@ -3,7 +3,10 @@
   <section>
     <div class="pt-5 mx-5">
       <div>
-        <h6 class="text-color text-2xl m-0">Transactions</h6>
+        <div>
+          <h6 class="text-color text-2xl m-0">Transactions</h6>
+          <Button @click="handleDownload">Download</Button>
+        </div>
         <br />
         <div v-if="!isLoading">
           <div v-bind:key="item.id" v-for="item in recordsData">
@@ -426,36 +429,40 @@ const fetchRecords = async () => {
   }
 }
 
-const fetchAccountInfo = async () => {
-  isLoading.value = true
+const createAndDownloadCsv = (csv: string) => {
+  const CSV_MIME_TYPE = 'text/csv;charset=utf-8;'
+  const filename = 'records.csv'
+  const csvContent = csv
+  const blob = new Blob([csvContent], { type: CSV_MIME_TYPE })
+  const link = document.createElement('a')
 
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const handleDownload = async () => {
   try {
-    const { data: accountDataResponse, error: accountError } = await supabase
-      .from('accounts')
+    const { data: csvData, error: csvError } = await supabase
+      .from('records')
       .select('*')
-      .eq('id', monthId)
+      .eq('month_id', monthId)
+      .csv()
 
-    if (accountDataResponse && accountDataResponse.length > 0) {
-      const { monthName, name, amount, type } = accountDataResponse[0]
-
-      accountInfo.value = accountDataResponse[0]
-      accountMonth.value.name = monthName
-      accountName.value = name
-      accountAmount.value = amount
-      accountType.value = type
-    }
-
-    if (accountError) {
+    if (csvError) {
       return toast.add({
         severity: 'error',
-        summary: accountError.message,
+        summary: csvError.message,
         life: 3000
       })
     }
+
+    createAndDownloadCsv(csvData)
   } catch (error) {
-    console.error('Error fetching data:', error)
-  } finally {
-    isLoading.value = false
+    console.error(error)
   }
 }
 
