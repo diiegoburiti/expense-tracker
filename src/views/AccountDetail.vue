@@ -137,7 +137,11 @@
               </div>
             </TabPanel>
             <TabPanel header="Records">
-              <Records />
+              <Records
+                :records="records || []"
+                :refetchRecords="fetchExpenses"
+                :csvFileName="accountInfo.name"
+              />
             </TabPanel>
           </TabView>
         </template>
@@ -245,6 +249,11 @@ import { useRoute, useRouter } from 'vue-router'
 import Charts from '@/components/Charts.vue'
 import Records from '@/components/Records.vue'
 import type { AccountResponseData, RecordsResponseData } from '@/types/response'
+
+enum RecordType {
+  INCOME = 'Income',
+  EXPENSE = 'Expense'
+}
 
 const optionsForAccountType = [
   { name: 'General', category: 'general', icon: 'pi pi-wallet' },
@@ -389,6 +398,7 @@ const fetchExpenses = async () => {
       .from('records')
       .select('*')
       .eq('month_id', monthId)
+      .order('date', { ascending: false })
 
     if (error) {
       console.error('Error fetching expenses:', error.message)
@@ -414,10 +424,6 @@ const fetchExpenses = async () => {
   }
 }
 
-enum RecordType {
-  INCOME = 'Income',
-  EXPENSE = 'Expense'
-}
 const expense = computed(() => {
   const expenseRecords =
     records.value?.filter(

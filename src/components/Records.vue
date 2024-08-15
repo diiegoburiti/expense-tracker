@@ -3,19 +3,24 @@
   <section>
     <div class="pt-5 mx-5">
       <div>
-        <div>
+        <div class="flex justify-content-between">
           <h6 class="text-color text-2xl m-0">Transactions</h6>
-          <Button @click="handleDownload">Download</Button>
+          <Button
+            icon="pi pi-download"
+            aria-label="Download"
+            @click="handleDownloadCsv"
+            :disabled="isDownloadDisabled"
+          />
         </div>
         <br />
         <div v-if="!isLoading">
-          <div v-bind:key="item.id" v-for="item in recordsData">
+          <div v-bind:key="item.id" v-for="item in records">
             <Card
               class="mb-3"
               :style="
                 item['record-type'] === RecordType.INCOME
-                  ? 'border-right: 10px solid var(--green-500)'
-                  : 'border-right: 10px solid var(--red-500)'
+                  ? 'border-right: .6rem solid var(--green-500)'
+                  : 'border-right: .6rem solid var(--red-500)'
               "
               :pt="{ body: { class: 'p-2' } }"
             >
@@ -60,7 +65,7 @@
               </template>
             </Card>
           </div>
-          <div v-if="!recordsData?.length">
+          <div v-if="isDownloadDisabled">
             Ops! There are not transitions yet :/
           </div>
         </div>
@@ -239,11 +244,17 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute } from 'vue-router'
-import type { AccountResponseData, RecordsResponseData } from '@/types/response'
+import type { RecordsResponseData } from '@/types/response'
+
+const props = defineProps<{
+  records: Array<RecordsResponseData>
+  refetchRecords: () => Promise<void>
+  csvFileName: string
+}>()
 
 enum RecordType {
   INCOME = 'Income',
@@ -275,23 +286,17 @@ const showDeleteRecord = ref(false)
 const expenseName = ref()
 const expenseValue = ref()
 const expenseDate = ref()
-const recordsData = ref<RecordsResponseData[]>()
-const accountInfo = ref<AccountResponseData>({} as AccountResponseData)
 const isLoading = ref(false)
 const editingRecord = ref(false)
 const recordToBeEdited = ref<RecordsResponseData>({} as RecordsResponseData)
 const recordToBeDeleted = ref<RecordsResponseData>({} as RecordsResponseData)
 const newRecordDate = ref()
-const accountName = ref()
-const accountAmount = ref()
-const accountMonth = ref({ name: '' })
-const accountType = ref({
-  name: '',
-  category: '',
-  icon: ''
-})
 const recordType = ref('Expense')
 const monthId = Number(route.params.id)
+
+const isDownloadDisabled = computed(() => {
+  return !props.records.length
+})
 
 const formatDate = (date: string) => {
   if (!date) return ''
@@ -329,7 +334,7 @@ const addRecord = async () => {
       detail: 'Record added with success',
       life: 3000
     })
-    return await fetchRecords()
+    return await props.refetchRecords()
   } catch (error) {
     console.error(error)
   } finally {
@@ -361,7 +366,7 @@ const handleDeleteRecord = async () => {
         detail: 'The record was deleted!!',
         life: 3000
       })
-      await fetchRecords()
+      await props.refetchRecords()
       showDeleteRecord.value = false
     }
   } catch (error) {
@@ -397,41 +402,16 @@ const handleEditRecord = async () => {
         detail: 'The record was edited with success!!',
         life: 3000
       })
-      await fetchRecords()
+      await props.refetchRecords()
     }
   } catch (error) {
     console.error(error)
   }
 }
 
-const fetchRecords = async () => {
-  isLoading.value = true
-
-  try {
-    const { data: recordsDataResponse, error: recordsError } = await supabase
-      .from('records')
-      .select('*')
-      .eq('month_id', monthId)
-      .order('date', { ascending: false })
-
-    if (recordsError) {
-      return toast.add({
-        severity: 'error',
-        summary: recordsError.message,
-        life: 3000
-      })
-    }
-    recordsData.value = recordsDataResponse
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  } finally {
-    isLoading.value = false
-  }
-}
-
 const createAndDownloadCsv = (csv: string) => {
   const CSV_MIME_TYPE = 'text/csv;charset=utf-8;'
-  const filename = 'records.csv'
+  const filename = props.csvFileName
   const csvContent = csv
   const blob = new Blob([csvContent], { type: CSV_MIME_TYPE })
   const link = document.createElement('a')
@@ -444,7 +424,7 @@ const createAndDownloadCsv = (csv: string) => {
   document.body.removeChild(link)
 }
 
-const handleDownload = async () => {
+const handleDownloadCsv = async () => {
   try {
     const { data: csvData, error: csvError } = await supabase
       .from('records')
@@ -465,9 +445,4 @@ const handleDownload = async () => {
     console.error(error)
   }
 }
-
-onMounted(async () => {
-  await fetchAccountInfo()
-  await fetchRecords()
-})
 </script>
