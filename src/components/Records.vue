@@ -429,37 +429,19 @@ const fetchRecords = async () => {
   }
 }
 
-const fetchAccountInfo = async () => {
-  isLoading.value = true
+const createAndDownloadCsv = (csv: string) => {
+  const CSV_MIME_TYPE = 'text/csv;charset=utf-8;'
+  const filename = 'records.csv'
+  const csvContent = csv
+  const blob = new Blob([csvContent], { type: CSV_MIME_TYPE })
+  const link = document.createElement('a')
 
-  try {
-    const { data: accountDataResponse, error: accountError } = await supabase
-      .from('accounts')
-      .select('*')
-      .eq('id', monthId)
-
-    if (accountDataResponse && accountDataResponse.length > 0) {
-      const { monthName, name, amount, type } = accountDataResponse[0]
-
-      accountInfo.value = accountDataResponse[0]
-      accountMonth.value.name = monthName
-      accountName.value = name
-      accountAmount.value = amount
-      accountType.value = type
-    }
-
-    if (accountError) {
-      return toast.add({
-        severity: 'error',
-        summary: accountError.message,
-        life: 3000
-      })
-    }
-  } catch (error) {
-    console.error('Error fetching data:', error)
-  } finally {
-    isLoading.value = false
-  }
+  const url = URL.createObjectURL(blob)
+  link.setAttribute('href', url)
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 const handleDownload = async () => {
@@ -478,17 +460,7 @@ const handleDownload = async () => {
       })
     }
 
-    const csvContent = csvData
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-
-    if (link.download !== undefined) {
-      const url = URL.createObjectURL(blob)
-      link.setAttribute('href', url)
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
+    createAndDownloadCsv(csvData)
   } catch (error) {
     console.error(error)
   }
