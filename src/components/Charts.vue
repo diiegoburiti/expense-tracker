@@ -1,5 +1,5 @@
 <template>
-  <div class="card flex justify-content-center gap-5">
+  <div class="card flex flex-column justify-content-center gap-5 sm:flex-row">
     <Chart
       type="doughnut"
       class="w-full md:w-30rem"

@@ -1,6 +1,6 @@
 <template>
   <Toast />
-  <section class="mx-5 pt-5">
+  <section class="mx-2 sm:mx-5 pt-5">
     <Card>
       <template #content>
         <div>
@@ -66,31 +66,48 @@
       </template>
     </Card>
 
-    <div class="flex gap-4 my-4">
-      <Card>
-        <template #title><span class="text-lg">Budget</span></template>
+    <div
+      class="flex justify-content-center gap-4 my-4 lg:justify-content-start"
+    >
+      <Card
+        class="max-w-6rem h-full sm:max-w-full"
+        :pt="{ body: { class: 'p-3 sm:p-4' } }"
+      >
+        <template #title
+          ><span class="text-sm sm:text-xl">Budget</span></template
+        >
         <template #content>
-          <span class="m-0 text-color-secondary text-xl font-bold">
+          <span class="m-0 text-color-secondary text-sm font-bold sm:text-xl">
             <span class="font-normal">$</span>
             {{ accountInfo?.amount }}
           </span>
         </template>
       </Card>
-      <Card>
-        <template #title><span class="text-lg">Expense</span></template>
+      <Card
+        class="max-w-6rem h-full sm:max-w-full"
+        :pt="{ body: { class: 'p-3 sm:p-4' } }"
+      >
+        <template #title
+          ><span class="text-sm sm:text-xl">Expense</span></template
+        >
         <template #content>
-          <span class="m-0 text-red-500 text-xl font-bold">
+          <span class="m-0 text-red-500 text-sm font-bold sm:text-xl">
             <span class="font-normal">$</span>
             {{ expense - income }}
           </span>
         </template>
       </Card>
 
-      <Card>
-        <template #title><span class="text-lg">Balance</span></template>
+      <Card
+        class="max-w-6rem h-full sm:max-w-full"
+        :pt="{ body: { class: 'p-3 sm:p-4' } }"
+      >
+        <template #title
+          ><span class="text-sm sm:text-lg">Balance</span></template
+        >
         <template #content>
           <span
-            class="m-0 text-xl font-bold"
+            class="m-0 text-sm font-bold sm:text-xl"
             :class="
               balance.isBalanceStatusPositive
                 ? 'text-green-500'
