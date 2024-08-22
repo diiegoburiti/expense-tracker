@@ -79,7 +79,8 @@
     </div>
 
     <Button
-      class="fixed bottom-0 right-50 font-bold mb-4"
+      class="fixed"
+      style="left: 50%; top: 94%; transform: translate(-50%, -50%)"
       icon="pi pi-plus"
       label="Add"
       @click="isModalVisible = true"
