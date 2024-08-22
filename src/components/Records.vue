@@ -1,10 +1,10 @@
 <template>
   <Toast />
   <section>
-    <div class="pt-5 mx-5">
+    <div class="mx-3 pt-5 sm:mx-5">
       <div>
-        <div class="flex justify-content-between">
-          <h6 class="text-color text-2xl m-0">Transactions</h6>
+        <div class="flex justify-content-between align-items-center">
+          <h6 class="text-color text-base sm:text-2xl m-0">Transactions</h6>
           <Button
             icon="pi pi-download"
             aria-label="Download"
@@ -27,36 +27,36 @@
               <template #content>
                 <div class="flex align-items-center">
                   <div class="flex align-items-center gap-2 flex-1">
-                    <p class="m-0 text-color capitalize">
+                    <p class="m-0 text-color text-sm capitalize">
                       {{ item.description }}
                     </p>
                     <Chip :label="item.category" class="text-xs" />
                   </div>
 
-                  <p class="m-0 text-color flex-1">
+                  <p class="mx-2 my-0 sm:m-0 text-color text-sm flex-1">
                     {{ item.amount }}
                   </p>
                   <div class="flex align-items-center">
-                    <p class="m-0 text-color capitalize">
+                    <p class="m-0 text-color text-sm capitalize">
                       {{ formatDate(item.date) }}
                     </p>
-                    <div class="ml-4 flex gap-2">
+                    <div class="ml-2 flex gap-2 sm:ml-4">
                       <Button
                         text
                         raised
                         rounded
-                        aria-label="Cancel"
-                        icon="pi pi-pencil"
                         severity="info"
+                        aria-label="Edit record"
+                        icon="pi pi-pencil"
                         @click="editRecord(item)"
                       />
                       <Button
-                        icon="pi pi-trash"
-                        severity="danger"
                         rounded
                         raised
                         outlined
-                        aria-label="Cancel"
+                        icon="pi pi-trash"
+                        severity="danger"
+                        aria-label="Delete record"
                         @click="deleteRecord(item)"
                       />
                     </div>
@@ -115,8 +115,8 @@
             </div>
           </div>
           <Divider />
-          <div class="flex gap-2">
-            <div>
+          <div class="flex gap-2 flex-column sm:flex-row">
+            <div class="flex flex-column sm:block">
               <label for="record-name" class="text-sm">Record name</label>
               <InputText
                 id="record-name"
@@ -127,7 +127,7 @@
               />
             </div>
 
-            <div>
+            <div class="flex flex-column sm:block">
               <label for="locale-us" class="text-sm">Amount</label>
               <InputNumber
                 v-model="expenseValue"
@@ -139,8 +139,10 @@
             </div>
           </div>
 
-          <div class="flex align-items-center gap-2 grid-nogutter">
-            <div class="col">
+          <div
+            class="flex align-items-center gap-2 grid-nogutter flex-column sm:flex-row"
+          >
+            <div class="w-full col">
               <label for="record-type" class="text-sm mb-2">Expense type</label>
               <Dropdown
                 filter
@@ -153,7 +155,7 @@
               />
             </div>
 
-            <div class="flex-1">
+            <div class="w-full flex-1">
               <label for="record-data" class="text-sm">Date</label>
               <Calendar
                 inputId="record-data"
@@ -175,10 +177,10 @@
 
     <Dialog
       header="Edit Record"
-      class="w-25rem"
       modal
       v-model:visible="editingRecord"
       :draggable="false"
+      class="w-25rem"
     >
       <form @submit.prevent="handleEditRecord">
         <div class="flex flex-column gap-2 gap-2 mb-3">
