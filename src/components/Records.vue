@@ -147,6 +147,7 @@
               <label for="record-type" class="text-sm mb-2">Expense type</label>
               <Dropdown
                 filter
+                :editable="!!category"
                 class="w-full"
                 inputId="record-type"
                 v-model="category"
@@ -314,7 +315,7 @@ const addRecord = async () => {
         amount: expenseValue.value,
         month_id: monthId,
         description: expenseName.value,
-        category: category.value.name,
+        category: category.value.name || category.value,
         date: expenseDate.value,
         'record-type': recordType.value as RecordType
       }
