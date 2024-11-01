@@ -214,6 +214,34 @@
   resolved "https://registry.npmjs.org/@pkgr/core/-/core-0.1.1.tgz"
   integrity sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==
 
+"@primeuix/styled@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@primeuix/styled/-/styled-0.3.0.tgz#d48ca35b5a6129e465da9baedc2c721728ec646d"
+  integrity sha512-XsLbmyM1u50A0EDATIHyqm5O/zOCSyNKPk4pNN8HFvEPehbsjf4tkXcRZAyaVvntSCLpV4XGAj7v5EDCQkBRlg==
+  dependencies:
+    "@primeuix/utils" "^0.3.0"
+
+"@primeuix/utils@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@primeuix/utils/-/utils-0.3.0.tgz#7e49c8bf6f97af7740902d51cdefd497ea13fdc0"
+  integrity sha512-d6ymWez1n+iqwzAVhyOTmrOHl5qnSX2oGlTy97qGuA15gLai+MQaxONHFNdDia8Q7o396v7KK9IvhAx9VET/+A==
+
+"@primevue/core@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@primevue/core/-/core-4.2.0.tgz#0026c71b4c4d4b6503db26461b4eac4b29f91765"
+  integrity sha512-1nH1MEfb378RIToaUWiBtNOxxS3geIX69LIfBbpoBIH6I50yb9w/eTLGyRfFZ3+rxaCO93+bjkEqPvpFzkyvCw==
+  dependencies:
+    "@primeuix/styled" "^0.3.0"
+    "@primeuix/utils" "^0.3.0"
+
+"@primevue/icons@4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@primevue/icons/-/icons-4.2.0.tgz#2df84c204a6d2f3dfd31ef75498186f5d62cfd42"
+  integrity sha512-GF3HP8rveRNq0+Mu4zVy+6ta68jmxGuydb4r04fAendXfOdupcoNirDaVJALBtwkj744POsZf0eLj4QnzRQKLQ==
+  dependencies:
+    "@primeuix/utils" "^0.3.0"
+    "@primevue/core" "4.2.0"
+
 "@rollup/rollup-android-arm-eabi@4.13.0":
   version "4.13.0"
   resolved "https://registry.yarnpkg.com/@rollup/rollup-android-arm-eabi/-/rollup-android-arm-eabi-4.13.0.tgz#b98786c1304b4ff8db3a873180b778649b5dff2b"
@@ -1512,10 +1540,15 @@ primeicons@^6.0.1:
   resolved "https://registry.npmjs.org/primeicons/-/primeicons-6.0.1.tgz"
   integrity sha512-KDeO94CbWI4pKsPnYpA1FPjo79EsY9I+M8ywoPBSf9XMXoe/0crjbUK7jcQEDHuc0ZMRIZsxH3TYLv4TUtHmAA==
 
-primevue@^3.50.0:
-  version "3.50.0"
-  resolved "https://registry.npmjs.org/primevue/-/primevue-3.50.0.tgz"
-  integrity sha512-vYpQzvIXSmF0hWUkviHEGnwbFY/G8jI2RSxoa75noJloI2rWhzOX+JarJ8iaesVOr7b2se31N/p7zOx6uh3ddQ==
+primevue@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/primevue/-/primevue-4.2.0.tgz#120599b72a293d5ad8776f8a8161abfeef3f061a"
+  integrity sha512-IvM6VXc9PbQxgYpt314Ge9xb/Xs+eU6icSMY713Swt0l3W7lQZWbb//irCWgM8y4FoXq60kQc8dqyWIVhRJZtQ==
+  dependencies:
+    "@primeuix/styled" "^0.3.0"
+    "@primeuix/utils" "^0.3.0"
+    "@primevue/core" "4.2.0"
+    "@primevue/icons" "4.2.0"
 
 punycode@^2.1.0:
   version "2.3.1"
