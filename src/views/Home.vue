@@ -40,6 +40,27 @@
                 </template>
               </Card>
             </router-link>
+            <Message
+              v-if="!expensesData?.length"
+              :closable="false"
+              severity="info"
+              class="m-0 p-2"
+              :pt="{
+                root: {
+                  class: 'bg-white border-none shadow-1'
+                },
+                icon: {
+                  class: 'text-primary'
+                },
+                closebutton: {
+                  class: 'text-primary'
+                }
+              }"
+            >
+              <span class="text-color"
+                >Ops! Looks like you have no expenses to see :/</span
+              >
+            </Message>
           </div>
           <Skeleton v-else width="100%" height="450px" />
         </div>
@@ -123,6 +144,7 @@ import { onMounted, ref } from 'vue'
 import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import type { AccountResponseData } from '@/types/response'
+import Message from 'primevue/message'
 
 const visible = ref(false)
 const amount = ref(0)
@@ -191,6 +213,7 @@ const registerAccount = async () => {
 }
 
 const fetchAccounts = async () => {
+  loadingData.value = true
   try {
     const { data, error } = await supabase.from('accounts').select('*')
 
@@ -214,7 +237,6 @@ const fetchAccounts = async () => {
 }
 
 onMounted(async () => {
-  loadingData.value = true
   await fetchAccounts()
 })
 </script>
