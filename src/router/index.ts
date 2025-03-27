@@ -43,6 +43,10 @@ const router = createRouter({
         title: 'About Us',
         auth: false
       }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/'
     }
   ]
 })
