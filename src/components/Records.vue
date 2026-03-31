@@ -5,12 +5,15 @@
       <div>
         <div class="flex justify-content-between align-items-center">
           <h6 class="text-color text-base sm:text-2xl m-0">Transactions</h6>
-          <Button
-            icon="pi pi-download"
-            aria-label="Download"
-            @click="handleDownloadCsv"
-            :disabled="isDownloadDisabled"
-          />
+          <div class="flex align-items-center gap-2">
+            <CsvImport :month-id="monthId" :refetch-records="refetchRecords" />
+            <Button
+              icon="pi pi-download"
+              aria-label="Download"
+              @click="handleDownloadCsv"
+              :disabled="isDownloadDisabled"
+            />
+          </div>
         </div>
         <br />
         <div v-if="!isLoading">
@@ -253,6 +256,7 @@ import { supabase } from '@/supabase'
 import { useToast } from 'primevue/usetoast'
 import { useRoute } from 'vue-router'
 import type { RecordsResponseData } from '@/types/response'
+import CsvImport from '@/components/CsvImport.vue'
 
 const props = defineProps<{
   records: Array<RecordsResponseData>
