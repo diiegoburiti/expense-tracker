@@ -316,7 +316,7 @@ const parseCsvLine = (line: string): string[] => {
     const ch = line[i]
     if (ch === '"') {
       inQuotes = !inQuotes
-    } else if (ch === ',' && !inQuotes) {
+    } else if (ch === ';' && !inQuotes) {
       result.push(current.trim())
       current = ''
     } else {
