@@ -138,64 +138,67 @@
         />
       </div>
 
-      <!-- Transactions Table -->
-      <div
-        class="overflow-auto border-1 border-200 border-round"
-        style="max-height: 300px"
+      <!-- Transactions DataTable -->
+      <DataTable
+        v-model:selection="selectedTransactions"
+        :value="filteredTransactions"
+        selectionMode="multiple"
+        :metaKeySelection="false"
+        scrollable
+        scrollHeight="300px"
+        class="text-sm"
       >
-        <table class="w-full text-sm">
-          <thead class="table-header">
-            <tr class="border-bottom-2 border-300">
-              <th
-                class="text-left py-2 px-3 cursor-pointer select-none whitespace-nowrap"
-                @click="toggleSort('date')"
-              >
-                Date <i :class="sortIcon('date')" class="ml-1" />
-              </th>
-              <th class="text-left py-2 px-3">Type</th>
-              <th class="text-left py-2 px-3">Description</th>
-              <th
-                class="text-right py-2 px-3 cursor-pointer select-none whitespace-nowrap"
-                @click="toggleSort('amount')"
-              >
-                Amount <i :class="sortIcon('amount')" class="ml-1" />
-              </th>
-              <th class="text-right py-2 px-3">Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(tx, i) in filteredTransactions"
-              :key="i"
-              class="border-bottom-1 border-100"
+        <Column selectionMode="multiple" style="width: 3rem" frozen />
+        <Column field="date" header="Date" sortable style="min-width: 8rem">
+          <template #body="{ data }">
+            <span class="whitespace-nowrap">{{ formatDate(data.date) }}</span>
+          </template>
+        </Column>
+        <Column field="type" header="Type" sortable style="min-width: 10rem">
+          <template #body="{ data }">
+            <Chip :label="data.type" class="text-xs" />
+          </template>
+        </Column>
+        <Column
+          field="description"
+          header="Description"
+          style="min-width: 12rem"
+        >
+          <template #body="{ data }">
+            <span class="text-color-secondary">{{ data.description }}</span>
+          </template>
+        </Column>
+        <Column
+          field="amount"
+          header="Amount"
+          sortable
+          style="min-width: 8rem"
+          headerClass="justify-content-end"
+          bodyClass="text-right"
+        >
+          <template #body="{ data }">
+            <span
+              class="font-semibold"
+              :class="data.amount >= 0 ? 'text-green-500' : 'text-red-500'"
             >
-              <td class="py-2 px-3 whitespace-nowrap">
-                {{ formatDate(tx.date) }}
-              </td>
-              <td class="py-2 px-3">
-                <Chip :label="tx.type" class="text-xs" />
-              </td>
-              <td class="py-2 px-3 text-color-secondary">
-                {{ tx.description }}
-              </td>
-              <td
-                class="py-2 px-3 text-right font-semibold"
-                :class="tx.amount >= 0 ? 'text-green-500' : 'text-red-500'"
-              >
-                {{ formatCurrency(tx.amount) }}
-              </td>
-              <td class="py-2 px-3 text-right text-color-secondary">
-                {{ formatCurrency(tx.balance) }}
-              </td>
-            </tr>
-            <tr v-if="filteredTransactions.length === 0">
-              <td colspan="5" class="py-5 text-center text-color-secondary">
-                No transactions match the current filters.
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              {{ formatCurrency(data.amount) }}
+            </span>
+          </template>
+        </Column>
+        <Column
+          field="balance"
+          header="Balance"
+          style="min-width: 8rem"
+          headerClass="justify-content-end"
+          bodyClass="text-right"
+        >
+          <template #body="{ data }">
+            <span class="text-color-secondary">{{
+              formatCurrency(data.balance)
+            }}</span>
+          </template>
+        </Column>
+      </DataTable>
 
       <!-- Summary Totals -->
       <div
@@ -223,6 +226,7 @@
           </p>
         </div>
         <p class="ml-auto m-0 text-sm text-color-secondary align-self-center">
+          {{ selectedTransactions.length }} selected &middot;
           {{ filteredTransactions.length }} of
           {{ parsedData.transactions.length }} transactions
         </p>
@@ -241,7 +245,7 @@
           label="Import Records"
           icon="pi pi-check"
           :loading="isImporting"
-          :disabled="parsedData.transactions.length === 0"
+          :disabled="selectedTransactions.length === 0"
           @click="handleImport"
         />
       </div>
@@ -253,6 +257,9 @@
 import { ref, computed } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import { supabase } from '@/supabase'
+import Message from 'primevue/message'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
 
 interface Transaction {
   date: Date
@@ -296,16 +303,13 @@ const filterType = ref<string | null>(null)
 const filterDateFrom = ref<Date | null>(null)
 const filterDateTo = ref<Date | null>(null)
 
-type SortField = 'date' | 'amount'
-type SortDir = 'asc' | 'desc'
-const sortField = ref<SortField | null>(null)
-const sortDir = ref<SortDir>('asc')
+const selectedTransactions = ref<Transaction[]>([])
 
 // ─── CSV Parsing ──────────────────────────────────────────────────────────────
 
 /**
  * Splits a single CSV line into fields, correctly handling quoted fields
- * that may contain commas (e.g. "-49,90" or "338,98").
+ * that may contain semicolons.
  */
 const parseCsvLine = (line: string): string[] => {
   const result: string[] = []
@@ -357,10 +361,10 @@ const parseStatement = (text: string): ParsedStatement => {
     )
   }
 
-  // Row 0: "Extrato Conta Corrente,,,,"  — title, discarded
-  // Row 1: "Conta,80373333,,,"
-  // Row 2: "Período,01/03/2026 a 15/03/2026,,,"
-  // Row 3: "Saldo,"338,98",,,"`
+  // Row 0: title — discarded
+  // Row 1: "Conta;80373333"
+  // Row 2: "Período;01/03/2026 a 15/03/2026"
+  // Row 3: "Saldo;338,98"
   // Row 4: blank
   // Row 5: column headers
   // Row 6+: transactions
@@ -464,16 +468,6 @@ const filteredTransactions = computed<Transaction[]>(() => {
     txs = txs.filter((t) => t.date <= to)
   }
 
-  if (sortField.value) {
-    const field = sortField.value
-    const dir = sortDir.value === 'asc' ? 1 : -1
-    txs = [...txs].sort((a, b) => {
-      if (field === 'date') return dir * (a.date.getTime() - b.date.getTime())
-      if (field === 'amount') return dir * (a.amount - b.amount)
-      return 0
-    })
-  }
-
   return txs
 })
 
@@ -500,24 +494,6 @@ const formatDate = (date: Date): string => {
 const formatCurrency = (value: number): string =>
   value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 
-// ─── Sorting ──────────────────────────────────────────────────────────────────
-
-const toggleSort = (field: SortField) => {
-  if (sortField.value !== field) {
-    sortField.value = field
-    sortDir.value = 'asc'
-  } else if (sortDir.value === 'asc') {
-    sortDir.value = 'desc'
-  } else {
-    sortField.value = null
-  }
-}
-
-const sortIcon = (field: SortField): string => {
-  if (sortField.value !== field) return 'pi pi-sort text-color-secondary'
-  return sortDir.value === 'asc' ? 'pi pi-sort-up' : 'pi pi-sort-down'
-}
-
 // ─── File handling ────────────────────────────────────────────────────────────
 
 const processFile = (file: File) => {
@@ -535,6 +511,7 @@ const processFile = (file: File) => {
         return
       }
       parsedData.value = parseStatement(text)
+      selectedTransactions.value = [...parsedData.value.transactions]
       parseError.value = null
     } catch (err) {
       parseError.value =
@@ -568,8 +545,8 @@ const clearFilters = () => {
 const reset = () => {
   parsedData.value = null
   parseError.value = null
+  selectedTransactions.value = []
   clearFilters()
-  sortField.value = null
   if (fileInputRef.value) fileInputRef.value.value = ''
 }
 
@@ -582,11 +559,11 @@ const toIsoDate = (date: Date): string => {
 }
 
 const handleImport = async () => {
-  if (!parsedData.value) return
+  if (!parsedData.value || selectedTransactions.value.length === 0) return
   isImporting.value = true
 
   try {
-    const records = parsedData.value.transactions.map((tx) => ({
+    const records = selectedTransactions.value.map((tx) => ({
       amount: Math.abs(tx.amount),
       description: tx.description || tx.type,
       month_id: props.monthId,
@@ -610,7 +587,7 @@ const handleImport = async () => {
 
     emit('imported', {
       meta: parsedData.value.meta,
-      transactions: parsedData.value.transactions
+      transactions: selectedTransactions.value
     })
 
     toast.add({
@@ -656,12 +633,5 @@ const handleImport = async () => {
 .upload-zone.drag-over {
   border-color: var(--primary-color);
   background-color: var(--primary-50, #f5f3ff);
-}
-
-.table-header th {
-  background: var(--surface-overlay, #fff);
-  position: sticky;
-  top: 0;
-  z-index: 1;
 }
 </style>
